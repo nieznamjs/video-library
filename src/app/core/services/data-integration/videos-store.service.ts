@@ -1,26 +1,30 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 
 import { SavedVideoData } from '../../../shared/interfaces/saved-video-data.interface';
-import { StorageService } from '../utils/storage.service';
 import { LOCAL_STORAGE_VIDEOS_KEY } from '../../config/videos-storage.config';
+import { StorageService } from '../utils/storage.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VideosStoreService {
 
-  public savedVideosData$ = new BehaviorSubject<SavedVideoData[]>(this.getSavedVideosData());
+  public savedVideos$ = new BehaviorSubject<SavedVideoData[]>(this.getSavedVideos());
 
   constructor(
     private storageService: StorageService,
   ) { }
 
-  public getSavedVideosData(): SavedVideoData[] {
+  public getSavedVideos(): SavedVideoData[] {
     return this.storageService.get(LOCAL_STORAGE_VIDEOS_KEY) || [];
   }
 
-  public saveNewVideo(video: SavedVideoData): void {
-    console.log(video)
+  public saveNewVideo(newVideo: SavedVideoData): void {
+    const savedVideos = this.getSavedVideos();
+    savedVideos.push(newVideo);
+
+    this.storageService.set(LOCAL_STORAGE_VIDEOS_KEY, savedVideos);
+    this.savedVideos$.next(this.getSavedVideos());
   }
 }

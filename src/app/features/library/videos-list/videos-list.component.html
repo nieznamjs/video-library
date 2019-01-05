@@ -1,1 +1,6 @@
-<app-video-item *ngFor="let video of savedVideosData$ | async" [video]="video"></app-video-item>
+<ul>
+  <li *ngFor="let video of videosData$ | async">
+    <app-video-item
+      [video]="video"></app-video-item>
+  </li>
+</ul>

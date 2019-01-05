@@ -1,0 +1,38 @@
+:host {
+  display: block;
+  padding-top: 15px;
+}
+
+.loading-spinner {
+  margin: 15px auto;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+ul.view-list {
+  li {
+    &:not(:first-child) {
+      margin-top: 15px;
+    }
+  }
+}
+
+ul.view-tiles {
+  display: flex;
+  flex-wrap: wrap;
+
+  margin: 0 -15px -15px 0;
+
+  li {
+    width: calc(33.33% - 15px);
+
+    margin: 0 15px 15px 0;
+    padding: 15px;
+
+    box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+  }
+}

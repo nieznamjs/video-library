@@ -1,0 +1,49 @@
+:host {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.view-list {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+
+  .result-data {
+    display: flex;
+    align-items: center;
+    flex: 1;
+
+    margin-right: 15px;
+  }
+
+  .video-data-wrapper {
+    margin: 0 15px;
+  }
+}
+
+.view-tiles {
+  width: 100%;
+
+  .thumbnail-img {
+    height: auto;
+    width: 100%;
+  }
+
+  .video-data-wrapper {
+    margin: 15px 0;
+  }
+}
+
+.thumbnail-img {
+  height: 70px;
+}
+
+.video-data-text {
+  margin: 0;
+
+  &:not(:last-child) {
+    margin-bottom: 5px;
+  }
+}
