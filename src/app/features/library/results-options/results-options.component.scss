@@ -1,0 +1,17 @@
+.options-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 5px 0;
+}
+
+.change-mode-icon {
+  font-size: 30px;
+  width: 30px;
+  height: 30px;
+
+  &:not(:last-child) {
+    margin-right: 10px;
+  }
+}

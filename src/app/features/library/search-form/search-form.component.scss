@@ -1,0 +1,27 @@
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+
+  padding-bottom: 15px;
+}
+
+.input-field {
+  margin-right: 15px;
+
+  width: 400px;
+
+  font-size: 14px;
+}
+
+.radios-wrapper {
+  display: block;
+  width: 100%;
+}
+
+.input-radio {
+  &:not(:last-child) {
+    margin-right: 10px;
+  }
+}
