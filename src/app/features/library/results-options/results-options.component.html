@@ -10,6 +10,17 @@
       </button>
     </div>
 
+    <div class="sort-wrapper">
+      <span class="sort-label">Sort by date</span>
+
+      <mat-form-field>
+        <mat-select [(value)]="sortType" (valueChange)="changeSorting()">
+          <mat-option [value]="sortAscending">Ascending</mat-option>
+          <mat-option [value]="sortDescending">Descending</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
     <div class="favourites-toggle-wrapper">
       <mat-slide-toggle [checked]="onlyFavourites" (change)="toggleFavourites($event)">Show only favourites</mat-slide-toggle>
     </div>

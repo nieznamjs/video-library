@@ -7,6 +7,15 @@
   </ul>
 </ng-template>
 
-<mat-paginator></mat-paginator>
+<mat-paginator
+  [length]="paginatorLength"
+  [pageIndex]="0"
+  [pageSizeOptions]="PAGE_SIZE_OPTIONS"
+  (page)="sliceVideosList()">
+</mat-paginator>
+
+<button mat-raised-button color="warn" (click)="clearAllVideos()">
+  Remove all videos
+</button>
 
 

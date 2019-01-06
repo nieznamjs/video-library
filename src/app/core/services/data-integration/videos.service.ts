@@ -12,12 +12,14 @@ import { VIMEO_VIDEO_TYPE, YT_VIDEO_TYPE } from '../../config/videos-type.config
 import { YtVideo } from '../../../shared/interfaces/youtube/yt-video.interface';
 import { VimeoVideo } from '../../../shared/interfaces/vimeo/vimeo-video.interface';
 import { HelperService } from '../utils/helper.service';
+import { SORT_DESCENDING } from '../../../shared/constans/sort-values';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VideosService {
 
+  public sortType = SORT_DESCENDING;
   public videos$ = new BehaviorSubject<ShownVideo[]>([]);
   public isLoading$ = new BehaviorSubject<boolean>(false);
 
@@ -30,7 +32,6 @@ export class VideosService {
 
   public getVideosData(): void {
     const savedVideos: SavedVideoData[] = this.videosStoreService.getSavedVideos();
-    const videosToShow: ShownVideo[] = [];
     const ytIds = [];
     const vimeoIds = [];
 
@@ -55,6 +56,7 @@ export class VideosService {
         })
       )
       .subscribe((responses: any) => {
+        let videosToShow: ShownVideo[] = [];
         const [ytResponse, vimeoResponse] = responses;
 
         ytResponse.items.forEach((ytVideo: YtVideo) => {
@@ -86,9 +88,38 @@ export class VideosService {
             type: VIMEO_VIDEO_TYPE,
           });
         });
+
+        if (this.sortType === SORT_DESCENDING) {
+          videosToShow = this.sortVideosDescending(videosToShow);
+        } else {
+          videosToShow = this.sortVideosAscending(videosToShow);
+        }
+
+        this.videos$.next(videosToShow);
       });
 
-    this.videos$.next(videosToShow);
     this.isLoading$.next(false);
+  }
+
+  public sortVideosAscending(videos: ShownVideo[]): ShownVideo[] {
+    return videos.sort((a, b) => {
+      if (a.addedToLibraryAt > b.addedToLibraryAt) {
+        return 1;
+      } else if (a.addedToLibraryAt < b.addedToLibraryAt) {
+        return -1;
+      }
+      return 0;
+    });
+  }
+
+  public sortVideosDescending(videos: ShownVideo[]): ShownVideo[] {
+    return videos.sort((a, b) => {
+      if (a.addedToLibraryAt < b.addedToLibraryAt) {
+        return 1;
+      } else if (a.addedToLibraryAt > b.addedToLibraryAt) {
+        return -1;
+      }
+      return 0;
+    });
   }
 }

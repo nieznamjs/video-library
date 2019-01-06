@@ -6,6 +6,15 @@
   padding: 5px 0;
 }
 
+.sort-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.sort-label {
+  margin-right: 10px;
+}
+
 .change-mode-icon {
   font-size: 30px;
   width: 30px;

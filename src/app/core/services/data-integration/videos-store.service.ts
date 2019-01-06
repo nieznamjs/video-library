@@ -64,4 +64,9 @@ export class VideosStoreService {
 
     this.saveToLocalStorage(filteredVideos);
   }
+
+  public clearLibrary(): void {
+    this.storageService.clear(LOCAL_STORAGE_VIDEOS_KEY);
+    this.savedVideos$.next(this.getSavedVideos());
+  }
 }

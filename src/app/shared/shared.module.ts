@@ -14,9 +14,10 @@ import {
   MatPaginatorModule,
   MatProgressSpinnerModule,
   MatRadioModule,
+  MatSelectModule,
   MatSlideToggleModule,
   MatSnackBarModule,
-  MatToolbarModule
+  MatToolbarModule,
 } from '@angular/material';
 
 import { HeaderComponent } from './components/header/header.component';
@@ -39,6 +40,7 @@ const materialModules = [
   MatDialogModule,
   MatRadioModule,
   MatSnackBarModule,
+  MatSelectModule,
 ];
 
 @NgModule({

@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator } from '@angular/material';
 
 import { VideosService } from '../../../core/services/data-integration/videos.service';
 import { VideosStoreService } from '../../../core/services/data-integration/videos-store.service';
@@ -16,6 +17,10 @@ export class VideosListComponent implements OnInit {
   public videosData: ShownVideo[];
   public isLoading$ = this.videosService.isLoading$;
   public viewMode$ = this.viewModeService.viewMode$;
+  public paginatorLength: number;
+  public readonly PAGE_SIZE_OPTIONS = [5, 10, 20, 50, 100];
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(
     private videosService: VideosService,
@@ -28,22 +33,29 @@ export class VideosListComponent implements OnInit {
       this.videosService.getVideosData();
     });
 
-    this.getAllVideosData();
-
     this.viewModeService.showOnlyFavourites$
       .subscribe((onlyFavourites: boolean) => {
         if (onlyFavourites) {
           this.videosData = this.videosData.filter(video => video.isFavourite);
+          this.paginatorLength = this.videosData.length;
         } else {
           this.getAllVideosData();
         }
       });
+  }
+  private sliceVideosList(): void {
+    this.videosData = this.videosData.slice(this.paginator.pageIndex, this.paginator.pageSize);
   }
 
   private getAllVideosData(): void {
     this.videosService.videos$
       .subscribe((videos: ShownVideo[]) => {
         this.videosData = videos;
+        this.paginatorLength = videos.length;
       });
+  }
+
+  public clearAllVideos(): void {
+    this.videosStoreService.clearLibrary();
   }
 }
