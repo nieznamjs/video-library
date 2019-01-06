@@ -69,6 +69,7 @@ export class SearchFormComponent implements OnInit {
               id: video.id,
               addedToLibraryAt: new Date(),
               isFavourite: false,
+              isDefault: false,
             };
 
             this.videosStoreService.saveNewVideo(foundVideo);
@@ -95,6 +96,7 @@ export class SearchFormComponent implements OnInit {
               id: this.helperService.extractId(video.link),
               addedToLibraryAt: new Date(),
               isFavourite: false,
+              isDefault: false,
             };
 
             this.videosStoreService.saveNewVideo(foundVideo);
