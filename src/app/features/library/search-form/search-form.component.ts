@@ -19,9 +19,9 @@ import { of } from 'rxjs';
   templateUrl: './search-form.component.html',
   styleUrls: ['./search-form.component.scss'],
   providers: [
-    { provide: YT_VIDEO_TYPE, useValue: 'xd' },
+    { provide: YT_VIDEO_TYPE, useValue: YT_VIDEO_TYPE },
     { provide: VIMEO_VIDEO_TYPE, useValue: VIMEO_VIDEO_TYPE },
-  ]
+  ],
 })
 export class SearchFormComponent implements OnInit {
 

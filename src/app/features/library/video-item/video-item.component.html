@@ -1,6 +1,6 @@
 <div class="view-list" >
   <div class="result-data">
-    <img [src]="video.thumbnailUrl" [alt]="video.title" class="thumbnail-img">
+    <img [src]="video.thumbnailUrl" [alt]="video.title" class="thumbnail-img" (click)="openModalWithVideo(video.id, video.type)">
 
     <div class="video-data-wrapper">
       <p class="video-data-text">Title: {{ video.title }}</p>
@@ -14,7 +14,16 @@
   </div>
 
   <button mat-raised-button
+          class="action-button"
           color="primary"
+          (click)="openModalWithVideo(video.id, video.type)">
+    Watch
+  </button>
+
+
+  <button mat-raised-button
+          color="primary"
+          class="action-button"
           (click)="addToFavourites(video.id)"
           *ngIf="!video.isFavourite">
     Add to favourites
@@ -22,9 +31,17 @@
 
   <button
     mat-raised-button
-    color="warn"
+    color="accent"
+    class="action-button"
     (click)="removeFromFavourites(video.id)"
     *ngIf="video.isFavourite">
     Remove from favourites
+  </button>
+
+  <button mat-raised-button
+          color="warn"
+          class="action-button"
+          (click)="removeFromLibrary(video.id)">
+    Remove from library
   </button>
 </div>

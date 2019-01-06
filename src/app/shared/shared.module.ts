@@ -23,6 +23,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { HttpClientModule } from '@angular/common/http';
 import { SuccessSnackbarComponent } from './components/snackbars/success-snackbar/success-snackbar.component';
 import { ErrorSnackbarComponent } from './components/snackbars/error-snackbar/error-snackbar.component';
+import { VideoModalComponent } from './components/video-modal/video-modal.component';
 
 const materialModules = [
   MatPaginatorModule,
@@ -45,6 +46,7 @@ const materialModules = [
     HeaderComponent,
     SuccessSnackbarComponent,
     ErrorSnackbarComponent,
+    VideoModalComponent,
   ],
   imports: [
     CommonModule,
@@ -63,10 +65,12 @@ const materialModules = [
     HeaderComponent,
     SuccessSnackbarComponent,
     ErrorSnackbarComponent,
+    VideoModalComponent,
   ],
   entryComponents: [
     SuccessSnackbarComponent,
     ErrorSnackbarComponent,
+    VideoModalComponent,
   ],
   providers: [
     {

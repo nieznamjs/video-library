@@ -4,6 +4,10 @@
   align-items: center;
 }
 
+.thumbnail-img {
+  cursor: pointer;
+}
+
 .view-list {
   display: flex;
   align-items: center;
@@ -45,5 +49,11 @@
 
   &:not(:last-child) {
     margin-bottom: 5px;
+  }
+}
+
+.action-button {
+  &:not(:last-child) {
+    margin-right: 10px;
   }
 }

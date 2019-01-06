@@ -57,4 +57,11 @@ export class VideosStoreService {
     videoToRemoveFromFavourites.isFavourite = false;
     this.saveToLocalStorage(savedVideos);
   }
+
+  public removeFromLibrary(id: string): void {
+    const savedVideos = this.getSavedVideos();
+    const filteredVideos = savedVideos.filter(video => video.id !== id);
+
+    this.saveToLocalStorage(filteredVideos);
+  }
 }

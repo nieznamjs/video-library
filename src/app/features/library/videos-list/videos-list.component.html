@@ -1,9 +1,8 @@
 <mat-spinner *ngIf="isLoading$ | async; else result"></mat-spinner>
 <ng-template #result>
   <ul>
-    <li *ngFor="let video of videosData$ | async">
-      <app-video-item
-        [video]="video"></app-video-item>
+    <li *ngFor="let video of videosData">
+      <app-video-item [video]="video"></app-video-item>
     </li>
   </ul>
 </ng-template>

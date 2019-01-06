@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Router } from '@angular/router';
 
 import { VIEW_LIST, VIEW_TILES } from '../../config/view-mode.config';
 
@@ -21,6 +20,6 @@ export class ViewModeService {
   }
 
   public toggleFavourites(onlyFavourites: boolean): void {
-    // TODO here
+    this.showOnlyFavourites$.next(onlyFavourites);
   }
 }

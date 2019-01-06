@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, forkJoin, of } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { catchError } from 'rxjs/operators';
 
 import { ShownVideo } from '../../../shared/interfaces/shown-video.interface';
 import { YtDataService } from './yt-data.service';
 import { VimeoDataService } from './vimeo-data.service';
 import { SavedVideoData } from '../../../shared/interfaces/saved-video-data.interface';
 import { VideosStoreService } from './videos-store.service';
-import { YT_VIDEO_TYPE } from '../../config/videos-type.config';
+import { VIMEO_VIDEO_TYPE, YT_VIDEO_TYPE } from '../../config/videos-type.config';
 import { YtVideo } from '../../../shared/interfaces/youtube/yt-video.interface';
 import { VimeoVideo } from '../../../shared/interfaces/vimeo/vimeo-video.interface';
 import { HelperService } from '../utils/helper.service';
-import { catchError } from 'rxjs/operators';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -83,7 +83,7 @@ export class VideosService {
             thumbnailUrl: vimeoVideo.pictures.sizes[2].link,
             addedToLibraryAt: videoDataFromStorage.addedToLibraryAt,
             isFavourite: videoDataFromStorage.isFavourite,
-            type: YT_VIDEO_TYPE,
+            type: VIMEO_VIDEO_TYPE,
           });
         });
       });
