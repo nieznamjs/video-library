@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, forkJoin, of } from 'rxjs';
-import { HttpErrorResponse } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
 
 import { ShownVideo } from '../../../shared/interfaces/shown-video.interface';
@@ -46,15 +45,14 @@ export class VideosService {
     });
 
     const ytObservable = this.ytDataService.getVideoByIds(ytIds);
-    const vimeoObservable = this.vimeoDataService.getVideoByIds(vimeoIds);
-
-    forkJoin([ytObservable, vimeoObservable])
+    const vimeoObservable = this.vimeoDataService.getVideoByIds(vimeoIds)
       .pipe(
-        catchError((err: HttpErrorResponse) => {
-          // TODO handle vimeo error when no vimeo video
+        catchError(() => {
           return of({});
         })
-      )
+      );
+
+    forkJoin([ytObservable, vimeoObservable])
       .subscribe((responses: any) => {
         let videosToShow: ShownVideo[] = [];
         const [ytResponse, vimeoResponse] = responses;
@@ -74,20 +72,22 @@ export class VideosService {
           });
         });
 
-        vimeoResponse.data.forEach((vimeoVideo: VimeoVideo) => {
-          const id = this.helperService.extractId(vimeoVideo.link);
-          const videoDataFromStorage = savedVideos.find(savedVideo => savedVideo.id === id);
+        if (vimeoResponse.data) {
+          vimeoResponse.data.forEach((vimeoVideo: VimeoVideo) => {
+            const id = this.helperService.extractId(vimeoVideo.link);
+            const videoDataFromStorage = savedVideos.find(savedVideo => savedVideo.id === id);
 
-          videosToShow.push({
-            id: id,
-            title: vimeoVideo.name,
-            likes: vimeoVideo.metadata.connections.likes.total.toString(),
-            thumbnailUrl: vimeoVideo.pictures.sizes[2].link,
-            addedToLibraryAt: videoDataFromStorage.addedToLibraryAt,
-            isFavourite: videoDataFromStorage.isFavourite,
-            type: VIMEO_VIDEO_TYPE,
+            videosToShow.push({
+              id: id,
+              title: vimeoVideo.name,
+              likes: vimeoVideo.metadata.connections.likes.total.toString(),
+              thumbnailUrl: vimeoVideo.pictures.sizes[2].link,
+              addedToLibraryAt: videoDataFromStorage.addedToLibraryAt,
+              isFavourite: videoDataFromStorage.isFavourite,
+              type: VIMEO_VIDEO_TYPE,
+            });
           });
-        });
+        }
 
         if (this.sortType === SORT_DESCENDING) {
           videosToShow = this.sortVideosDescending(videosToShow);
