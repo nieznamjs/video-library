@@ -15,6 +15,7 @@ export class VideosListComponent implements OnInit {
   private savedVideosData$ = this.videosStoreService.savedVideos$;
   public videosData: ShownVideo[];
   public isLoading$ = this.videosService.isLoading$;
+  public viewMode$ = this.viewModeService.viewMode$;
 
   constructor(
     private videosService: VideosService,

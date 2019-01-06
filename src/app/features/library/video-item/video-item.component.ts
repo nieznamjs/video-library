@@ -3,6 +3,7 @@ import { Component, Input } from '@angular/core';
 import { ShownVideo } from '../../../shared/interfaces/shown-video.interface';
 import { VideosStoreService } from '../../../core/services/data-integration/videos-store.service';
 import { VideoModalService } from '../../../core/services/utils/video-modal.service';
+import { ViewModeService } from '../../../core/services/utils/view-mode.service';
 
 @Component({
   selector: 'app-video-item',
@@ -11,11 +12,13 @@ import { VideoModalService } from '../../../core/services/utils/video-modal.serv
 })
 export class VideoItemComponent {
 
-  @Input() video: ShownVideo;
+  @Input() public video: ShownVideo;
+  public viewMode$ = this.viewModeService.viewMode$;
 
   constructor(
     private videosStoreService: VideosStoreService,
     private videoModalService: VideoModalService,
+    private viewModeService: ViewModeService,
   ) { }
 
   public openModalWithVideo(id: string, type: string): void {

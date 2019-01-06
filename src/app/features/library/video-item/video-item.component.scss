@@ -25,6 +25,12 @@
   .video-data-wrapper {
     margin: 0 15px;
   }
+
+  .action-button {
+    &:not(:last-child) {
+      margin-right: 10px;
+    }
+  }
 }
 
 .view-tiles {
@@ -38,6 +44,14 @@
   .video-data-wrapper {
     margin: 15px 0;
   }
+
+  .action-button {
+    width: 100%;
+
+    &:not(:last-child) {
+      margin-bottom: 10px;
+    }
+  }
 }
 
 .thumbnail-img {
@@ -49,11 +63,5 @@
 
   &:not(:last-child) {
     margin-bottom: 5px;
-  }
-}
-
-.action-button {
-  &:not(:last-child) {
-    margin-right: 10px;
   }
 }
