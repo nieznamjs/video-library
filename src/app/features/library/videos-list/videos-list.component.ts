@@ -33,15 +33,7 @@ export class VideosListComponent implements OnInit {
       this.videosService.getVideosData();
     });
 
-    this.viewModeService.showOnlyFavourites$
-      .subscribe((onlyFavourites: boolean) => {
-        if (onlyFavourites) {
-          this.videosData = this.videosData.filter(video => video.isFavourite);
-          this.paginatorLength = this.videosData.length;
-        } else {
-          this.getAllVideosData();
-        }
-      });
+    this.getAllVideosData();
   }
   private sliceVideosList(): void {
     this.videosData = this.videosData.slice(this.paginator.pageIndex, this.paginator.pageSize);

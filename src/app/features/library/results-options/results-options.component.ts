@@ -1,6 +1,6 @@
-import { Component, Inject, OnInit } from '@angular/core';
-
+import { Component, Inject } from '@angular/core';
 import { MatSlideToggleChange } from '@angular/material';
+
 import { ViewModeService } from '../../../core/services/utils/view-mode.service';
 import { SORT_ASCENDING, SORT_DESCENDING } from '../../../shared/constans/sort-values';
 import { VideosService } from '../../../core/services/data-integration/videos.service';
@@ -14,7 +14,7 @@ import { VideosService } from '../../../core/services/data-integration/videos.se
     { provide: SORT_DESCENDING, useValue: SORT_DESCENDING },
   ],
 })
-export class ResultsOptionsComponent implements OnInit {
+export class ResultsOptionsComponent {
 
   public onlyFavourites: boolean;
   public sortType: string = this.sortDescending;
@@ -25,13 +25,6 @@ export class ResultsOptionsComponent implements OnInit {
     @Inject(SORT_ASCENDING) public sortAscending,
     @Inject(SORT_DESCENDING) public sortDescending,
   ) {}
-
-  public ngOnInit(): void {
-    this.viewModeService.showOnlyFavourites$
-      .subscribe((value: boolean) => {
-        this.onlyFavourites = value;
-      });
-  }
 
   public changeSorting(): void {
     this.videosService.sortType = this.sortType;
@@ -47,6 +40,7 @@ export class ResultsOptionsComponent implements OnInit {
   }
 
   public toggleFavourites(event: MatSlideToggleChange): void {
-    this.viewModeService.toggleFavourites(event.checked);
+    this.videosService.showOnlyFavourites = event.checked;
+    this.videosService.getVideosData();
   }
 }

@@ -19,6 +19,7 @@ import { SORT_DESCENDING } from '../../../shared/constans/sort-values';
 export class VideosService {
 
   public sortType = SORT_DESCENDING;
+  public showOnlyFavourites = false;
   public videos$ = new BehaviorSubject<ShownVideo[]>([]);
   public isLoading$ = new BehaviorSubject<boolean>(false);
 
@@ -30,11 +31,15 @@ export class VideosService {
   ) {}
 
   public getVideosData(): void {
-    const savedVideos: SavedVideoData[] = this.videosStoreService.getSavedVideos();
+    let savedVideos: SavedVideoData[] = this.videosStoreService.getSavedVideos();
     const ytIds = [];
     const vimeoIds = [];
 
     this.isLoading$.next(true);
+
+    if (this.showOnlyFavourites) {
+      savedVideos = savedVideos.filter(video => video.isFavourite);
+    }
 
     savedVideos.forEach((video: SavedVideoData) => {
       if (video.type === YT_VIDEO_TYPE) {
