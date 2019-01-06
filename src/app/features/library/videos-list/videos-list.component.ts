@@ -18,6 +18,10 @@ export class VideosListComponent implements OnInit {
   public isLoading$ = this.videosService.isLoading$;
   public viewMode$ = this.viewModeService.viewMode$;
   public paginatorLength: number;
+  public pageIndex = 0;
+  public pageSize = 5;
+  public lowValue = 0;
+  public highValue = 5;
   public readonly PAGE_SIZE_OPTIONS = [5, 10, 20, 50, 100];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -35,8 +39,19 @@ export class VideosListComponent implements OnInit {
 
     this.getAllVideosData();
   }
-  private sliceVideosList(): void {
-    this.videosData = this.videosData.slice(this.paginator.pageIndex, this.paginator.pageSize);
+
+  public sliceVideosList(event): void {
+    if (event.pageIndex === this.pageIndex + 1) {
+      this.lowValue = this.lowValue + this.pageSize;
+      this.highValue = this.highValue + this.pageSize;
+    } else if (event.pageIndex === this.pageIndex - 1) {
+      this.lowValue = this.lowValue - this.pageSize;
+      this.highValue = this.highValue - this.pageSize;
+    } else {
+      this.pageSize = this.highValue = event.pageSize;
+      this.lowValue = 0;
+    }
+    this.pageIndex = event.pageIndex;
   }
 
   private getAllVideosData(): void {

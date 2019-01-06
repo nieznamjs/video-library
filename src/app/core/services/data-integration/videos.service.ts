@@ -101,9 +101,8 @@ export class VideosService {
         }
 
         this.videos$.next(videosToShow);
+        this.isLoading$.next(false);
       });
-
-    this.isLoading$.next(false);
   }
 
   public sortVideosAscending(videos: ShownVideo[]): ShownVideo[] {
