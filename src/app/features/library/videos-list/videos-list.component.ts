@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 
 import { VideosService } from '../../../core/services/data-integration/videos.service';
 import { VideosStoreService } from '../../../core/services/data-integration/videos-store.service';
-import { SavedVideoData } from '../../../shared/interfaces/saved-video-data.interface';
 
 @Component({
   selector: 'app-videos-list',
@@ -13,6 +12,7 @@ export class VideosListComponent implements OnInit {
 
   private savedVideosData$ = this.videosStoreService.savedVideos$;
   public videosData$ = this.videosService.videos$;
+  public isLoading$ = this.videosService.isLoading$;
 
   constructor(
     private videosService: VideosService,

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
+  MAT_SNACK_BAR_DEFAULT_OPTIONS,
   MatButtonModule,
   MatCardModule,
   MatDialogModule,
@@ -20,6 +21,8 @@ import {
 
 import { HeaderComponent } from './components/header/header.component';
 import { HttpClientModule } from '@angular/common/http';
+import { SuccessSnackbarComponent } from './components/snackbars/success-snackbar/success-snackbar.component';
+import { ErrorSnackbarComponent } from './components/snackbars/error-snackbar/error-snackbar.component';
 
 const materialModules = [
   MatPaginatorModule,
@@ -40,6 +43,8 @@ const materialModules = [
 @NgModule({
   declarations: [
     HeaderComponent,
+    SuccessSnackbarComponent,
+    ErrorSnackbarComponent,
   ],
   imports: [
     CommonModule,
@@ -56,6 +61,20 @@ const materialModules = [
     ReactiveFormsModule,
     HttpClientModule,
     HeaderComponent,
-  ]
+    SuccessSnackbarComponent,
+    ErrorSnackbarComponent,
+  ],
+  entryComponents: [
+    SuccessSnackbarComponent,
+    ErrorSnackbarComponent,
+  ],
+  providers: [
+    {
+      provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
+      useValue: {
+        duration: 3000,
+      },
+    },
+  ],
 })
 export class SharedModule { }

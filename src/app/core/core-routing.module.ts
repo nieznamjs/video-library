@@ -5,7 +5,7 @@ import { LibraryComponent } from '../features/library/library.component';
 
 const routes: Routes = [
   { path: 'library', component: LibraryComponent },
-  { path: '', pathMatch: 'full', redirectTo: 'library' },
+  { path: '**', redirectTo: 'library' },
 ];
 
 @NgModule({

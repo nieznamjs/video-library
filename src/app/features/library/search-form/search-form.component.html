@@ -1,6 +1,7 @@
 <form class="search-form" [formGroup]="form" (submit)="onSubmit()">
   <mat-form-field class="input-field">
     <input type="text" matInput formControlName="id" placeholder="Find video">
+    <mat-error *ngIf="form.controls.id.invalid">You need enter an ID or URL</mat-error>
   </mat-form-field>
 
   <button mat-raised-button color="accent" type="submit">

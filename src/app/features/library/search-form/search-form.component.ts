@@ -9,6 +9,10 @@ import { YtVideosResponse } from '../../../shared/interfaces/youtube/yt-videos-r
 import { VimeoResponse } from '../../../shared/interfaces/vimeo/vimeo-response.interface';
 import { SavedVideoData } from '../../../shared/interfaces/saved-video-data.interface';
 import { VideosStoreService } from '../../../core/services/data-integration/videos-store.service';
+import { SnackbarService } from '../../../core/services/utils/snackbar.service';
+import { catchError } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-search-form',
@@ -22,6 +26,7 @@ import { VideosStoreService } from '../../../core/services/data-integration/vide
 export class SearchFormComponent implements OnInit {
 
   public form: FormGroup;
+  private readonly VIDEO_NOT_FOUND_MESSAGE = 'Video not found';
 
   constructor(
     private fb: FormBuilder,
@@ -29,12 +34,17 @@ export class SearchFormComponent implements OnInit {
     private ytDataService: YtDataService,
     private vimeoDataService: VimeoDataService,
     private videosStoreService: VideosStoreService,
+    private snackbarService: SnackbarService,
     @Inject(YT_VIDEO_TYPE) public ytVideoType: string,
     @Inject(VIMEO_VIDEO_TYPE) public vimeoVideoType: string,
   ) {}
 
   public ngOnInit(): void {
     this.form = this.createForm();
+  }
+
+  private clearInput(): void {
+    this.form.controls.id.reset();
   }
 
   public onSubmit(): void {
@@ -51,30 +61,48 @@ export class SearchFormComponent implements OnInit {
         .subscribe((response: YtVideosResponse) => {
           const video = response.items[0];
 
-          foundVideo = {
-            type: YT_VIDEO_TYPE,
-            id: video.id,
-            addedToLibraryAt: new Date(),
-            isFavourite: false,
-          };
+          if (!video) {
+            this.snackbarService.openErrorSnackbar(this.VIDEO_NOT_FOUND_MESSAGE);
+          } else {
+            foundVideo = {
+              type: YT_VIDEO_TYPE,
+              id: video.id,
+              addedToLibraryAt: new Date(),
+              isFavourite: false,
+            };
 
-          this.videosStoreService.saveNewVideo(foundVideo);
+            this.videosStoreService.saveNewVideo(foundVideo);
+          }
         });
     } else {
       this.vimeoDataService.getVideoByIds([id])
+        .pipe(
+          catchError((err: HttpErrorResponse) => {
+            if (err.statusText === 'Bad Request') {
+              this.snackbarService.openErrorSnackbar(this.VIDEO_NOT_FOUND_MESSAGE);
+            }
+            return of({});
+          })
+        )
         .subscribe((response: VimeoResponse) => {
-          const video = response.data[0];
+          if (!response.data[0]) {
+            this.snackbarService.openErrorSnackbar(this.VIDEO_NOT_FOUND_MESSAGE);
+          } else {
+            const video = response.data[0];
 
-          foundVideo = {
-            type: YT_VIDEO_TYPE,
-            id: this.helperService.extractId(video.link),
-            addedToLibraryAt: new Date(),
-            isFavourite: false,
-          };
+            foundVideo = {
+              type: VIMEO_VIDEO_TYPE,
+              id: this.helperService.extractId(video.link),
+              addedToLibraryAt: new Date(),
+              isFavourite: false,
+            };
 
-          this.videosStoreService.saveNewVideo(foundVideo);
+            this.videosStoreService.saveNewVideo(foundVideo);
+          }
         });
     }
+
+    this.clearInput();
   }
 
   private createForm(): FormGroup {

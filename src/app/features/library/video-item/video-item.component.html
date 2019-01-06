@@ -5,7 +5,7 @@
     <div class="video-data-wrapper">
       <p class="video-data-text">Title: {{ video.title }}</p>
 
-      <p class="video-data-text">Added at: {{ video.addedAt | date: 'dd.MM.yyyy' }}</p>
+      <p class="video-data-text">Added to library at: {{ video.addedToLibraryAt | date: 'dd.MM.yyyy hh:mm' }}</p>
 
       <p class="video-data-text">Likes: {{ video.likes }}</p>
 
@@ -15,16 +15,16 @@
 
   <button mat-raised-button
           color="primary"
-          (click)="addToFavourites()"
-          *ngIf="!video.addedToFavouritesAt">
+          (click)="addToFavourites(video.id)"
+          *ngIf="!video.isFavourite">
     Add to favourites
   </button>
 
   <button
     mat-raised-button
     color="warn"
-    (click)="removeFromFavourites()"
-    *ngIf="video.addedToFavouritesAt">
+    (click)="removeFromFavourites(video.id)"
+    *ngIf="video.isFavourite">
     Remove from favourites
   </button>
 </div>
