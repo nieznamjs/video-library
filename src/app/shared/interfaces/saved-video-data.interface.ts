@@ -3,5 +3,4 @@ export interface SavedVideoData {
   type: string;
   addedToLibraryAt: Date;
   isFavourite: boolean;
-  isDefault: boolean;
 }

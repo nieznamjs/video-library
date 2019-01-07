@@ -47,6 +47,10 @@ export class SearchFormComponent implements OnInit {
     this.form.controls.id.reset();
   }
 
+  public getDemoVideos(): void {
+    this.videosStoreService.getDemoVideos();
+  }
+
   public onSubmit(): void {
     const id = this.helperService.extractId(this.form.value.id);
     const type = this.form.value.type;
@@ -69,7 +73,6 @@ export class SearchFormComponent implements OnInit {
               id: video.id,
               addedToLibraryAt: new Date(),
               isFavourite: false,
-              isDefault: false,
             };
 
             this.videosStoreService.saveNewVideo(foundVideo);
@@ -96,7 +99,6 @@ export class SearchFormComponent implements OnInit {
               id: this.helperService.extractId(video.link),
               addedToLibraryAt: new Date(),
               isFavourite: false,
-              isDefault: false,
             };
 
             this.videosStoreService.saveNewVideo(foundVideo);

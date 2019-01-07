@@ -7,5 +7,4 @@ export interface ShownVideo {
   thumbnailUrl: string;
   addedToLibraryAt: Date;
   isFavourite: boolean;
-  isDefault: boolean;
 }

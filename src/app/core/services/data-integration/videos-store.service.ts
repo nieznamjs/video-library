@@ -5,6 +5,7 @@ import { SavedVideoData } from '../../../shared/interfaces/saved-video-data.inte
 import { LOCAL_STORAGE_VIDEOS_KEY } from '../../config/videos-storage.config';
 import { StorageService } from '../utils/storage.service';
 import { SnackbarService } from '../utils/snackbar.service';
+import { DEFAULT_VIDEOS_DATA } from '../../config/default-request.config';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,10 @@ export class VideosStoreService {
   private saveToLocalStorage(videos: SavedVideoData[]) {
     this.storageService.set(LOCAL_STORAGE_VIDEOS_KEY, videos);
     this.savedVideos$.next(this.getSavedVideos());
+  }
+
+  public getDemoVideos(): void {
+    this.saveToLocalStorage(DEFAULT_VIDEOS_DATA);
   }
 
   public getSavedVideos(): SavedVideoData[] {

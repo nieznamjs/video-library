@@ -12,7 +12,6 @@ import { YtVideo } from '../../../shared/interfaces/youtube/yt-video.interface';
 import { VimeoVideo } from '../../../shared/interfaces/vimeo/vimeo-video.interface';
 import { HelperService } from '../utils/helper.service';
 import { SORT_DESCENDING } from '../../../shared/constans/sort-values';
-import { DEFAULT_VIDEOS_DATA } from '../../config/default-request.config';
 
 @Injectable({
   providedIn: 'root'
@@ -33,9 +32,6 @@ export class VideosService {
 
   public getVideosData(): void {
     let savedVideos: SavedVideoData[] = this.videosStoreService.getSavedVideos();
-    if (savedVideos.length === 0) {
-      savedVideos = DEFAULT_VIDEOS_DATA;
-    }
     const ytIds = [];
     const vimeoIds = [];
 
@@ -78,7 +74,6 @@ export class VideosService {
             addedToLibraryAt: videoDataFromStorage.addedToLibraryAt,
             isFavourite: videoDataFromStorage.isFavourite,
             type: YT_VIDEO_TYPE,
-            isDefault: videoDataFromStorage.isDefault,
           });
         });
 
@@ -95,7 +90,6 @@ export class VideosService {
               addedToLibraryAt: videoDataFromStorage.addedToLibraryAt,
               isFavourite: videoDataFromStorage.isFavourite,
               type: VIMEO_VIDEO_TYPE,
-              isDefault: videoDataFromStorage.isDefault,
             });
           });
         }
