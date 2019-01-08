@@ -48,10 +48,13 @@ export class VideosStoreService {
   }
 
   public addVideoToFavourites(id: string): void {
-    const savedVideos = this.getSavedVideos();
-    const videoToSetAsFavourite = savedVideos.find(savedVideo => savedVideo.id === id);
+    const savedVideos = this.getSavedVideos().map((savedVideo: SavedVideoData) => {
+      if (savedVideo.id === id) {
+        savedVideo.isFavourite = true;
+      }
+      return savedVideo;
+    });
 
-    videoToSetAsFavourite.isFavourite = true;
     this.saveToLocalStorage(savedVideos);
   }
 

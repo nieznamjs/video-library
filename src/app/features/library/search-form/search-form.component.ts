@@ -1,6 +1,9 @@
 import { Component, Inject, OnInit } from '@angular/core';
-
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
+
 import { HelperService } from '../../../core/services/utils/helper.service';
 import { VIMEO_VIDEO_TYPE, YT_VIDEO_TYPE } from '../../../core/config/videos-type.config';
 import { YtDataService } from '../../../core/services/data-integration/yt-data.service';
@@ -10,9 +13,6 @@ import { VimeoResponse } from '../../../shared/interfaces/vimeo/vimeo-response.i
 import { SavedVideoData } from '../../../shared/interfaces/saved-video-data.interface';
 import { VideosStoreService } from '../../../core/services/data-integration/videos-store.service';
 import { SnackbarService } from '../../../core/services/utils/snackbar.service';
-import { catchError } from 'rxjs/operators';
-import { HttpErrorResponse } from '@angular/common/http';
-import { of } from 'rxjs';
 
 @Component({
   selector: 'app-search-form',
@@ -44,7 +44,7 @@ export class SearchFormComponent implements OnInit {
   }
 
   private clearInput(): void {
-    this.form.controls.id.reset();
+    this.form.controls.searchField.reset();
   }
 
   public getDemoVideos(): void {
@@ -52,7 +52,7 @@ export class SearchFormComponent implements OnInit {
   }
 
   public onSubmit(): void {
-    const id = this.helperService.extractId(this.form.value.id);
+    const id = this.helperService.extractId(this.form.value.searchField);
     const type = this.form.value.type;
     let foundVideo: SavedVideoData;
 
@@ -111,7 +111,7 @@ export class SearchFormComponent implements OnInit {
 
   private createForm(): FormGroup {
     return this.fb.group({
-      id: ['', Validators.required],
+      searchField: ['', Validators.required],
       type: [YT_VIDEO_TYPE],
     });
   }

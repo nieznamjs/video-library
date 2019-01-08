@@ -62,10 +62,10 @@ export class VideosService {
         let videosToShow: ShownVideo[] = [];
         const [ytResponse, vimeoResponse] = responses;
 
-        ytResponse.items.forEach((ytVideo: YtVideo) => {
+        const ytVideos = ytResponse.items.map((ytVideo: YtVideo) => {
           const videoDataFromStorage = savedVideos.find(savedVideo => savedVideo.id === ytVideo.id);
 
-          videosToShow.push({
+          return {
             id: ytVideo.id,
             title: ytVideo.snippet.title,
             likes: ytVideo.statistics.likeCount,
@@ -74,15 +74,30 @@ export class VideosService {
             addedToLibraryAt: videoDataFromStorage.addedToLibraryAt,
             isFavourite: videoDataFromStorage.isFavourite,
             type: YT_VIDEO_TYPE,
-          });
+          };
         });
 
+        // ytResponse.items.forEach((ytVideo: YtVideo) => {
+        //   const videoDataFromStorage = savedVideos.find(savedVideo => savedVideo.id === ytVideo.id);
+        //
+        //   videosToShow.push({
+        //     id: ytVideo.id,
+        //     title: ytVideo.snippet.title,
+        //     likes: ytVideo.statistics.likeCount,
+        //     views: ytVideo.statistics.viewCount,
+        //     thumbnailUrl: ytVideo.snippet.thumbnails.default.url,
+        //     addedToLibraryAt: videoDataFromStorage.addedToLibraryAt,
+        //     isFavourite: videoDataFromStorage.isFavourite,
+        //     type: YT_VIDEO_TYPE,
+        //   });
+        // });
+
         if (vimeoResponse.data) {
-          vimeoResponse.data.forEach((vimeoVideo: VimeoVideo) => {
+          const vimeoVideos = vimeoResponse.data.map((vimeoVideo: VimeoVideo) => {
             const id = this.helperService.extractId(vimeoVideo.link);
             const videoDataFromStorage = savedVideos.find(savedVideo => savedVideo.id === id);
 
-            videosToShow.push({
+            return {
               id: id,
               title: vimeoVideo.name,
               likes: vimeoVideo.metadata.connections.likes.total.toString(),
@@ -90,9 +105,13 @@ export class VideosService {
               addedToLibraryAt: videoDataFromStorage.addedToLibraryAt,
               isFavourite: videoDataFromStorage.isFavourite,
               type: VIMEO_VIDEO_TYPE,
-            });
+            };
           });
+
+          videosToShow = videosToShow.concat(vimeoVideos);
         }
+
+        videosToShow = videosToShow.concat(ytVideos);
 
         if (this.sortType === SORT_DESCENDING) {
           videosToShow = this.sortVideosDescending(videosToShow);
