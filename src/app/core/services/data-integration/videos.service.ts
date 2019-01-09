@@ -7,7 +7,7 @@ import { YtDataService } from './yt-data.service';
 import { VimeoDataService } from './vimeo-data.service';
 import { SavedVideoData } from '../../../shared/interfaces/saved-video-data.interface';
 import { VideosStoreService } from './videos-store.service';
-import { YT_VIDEO_TYPE } from '../../config/videos-type.config';
+import { YT_VIDEO_TYPE } from '../../../shared/constans/videos-types';
 import { SORT_DESCENDING } from '../../../shared/constans/sort-values';
 
 @Injectable({

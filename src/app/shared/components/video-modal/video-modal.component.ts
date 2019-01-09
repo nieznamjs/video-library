@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 
 import { ModalVideoData } from '../../interfaces/modal-video-data.interface';
-import { VIMEO_VIDEO_TYPE, YT_VIDEO_TYPE } from '../../../core/config/videos-type.config';
+import { VIMEO_VIDEO_TYPE, YT_VIDEO_TYPE } from '../../constans/videos-types';
 
 @Component({
   selector: 'app-video-modal',

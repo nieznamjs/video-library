@@ -8,7 +8,7 @@ import { VIMEO_API_KEY } from '../../../../secrets';
 import { catchError, map } from 'rxjs/operators';
 import { VideoNotSaved } from '../../../shared/interfaces/video-not-saved.interface';
 import { VimeoVideo } from '../../../shared/interfaces/vimeo/vimeo-video.interface';
-import { VIMEO_VIDEO_TYPE } from '../../config/videos-type.config';
+import { VIMEO_VIDEO_TYPE } from '../../../shared/constans/videos-types';
 import { HelperService } from '../utils/helper.service';
 
 @Injectable({

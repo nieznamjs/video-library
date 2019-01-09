@@ -7,7 +7,7 @@ import { environment } from '../../../../environments/environment';
 import { YtVideosResponse } from '../../../shared/interfaces/youtube/yt-videos-response.interface';
 import { YT_API_KEY } from '../../../../secrets';
 import { YtVideo } from '../../../shared/interfaces/youtube/yt-video.interface';
-import { YT_VIDEO_TYPE } from '../../config/videos-type.config';
+import { YT_VIDEO_TYPE } from '../../../shared/constans/videos-types';
 import { VideoNotSaved } from '../../../shared/interfaces/video-not-saved.interface';
 
 @Injectable({

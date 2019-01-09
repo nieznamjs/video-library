@@ -3,7 +3,7 @@ import { FormBuilder } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 
 import { HelperService } from '../../../core/services/utils/helper.service';
-import { VIMEO_VIDEO_TYPE, YT_VIDEO_TYPE } from '../../../core/config/videos-type.config';
+import { VIMEO_VIDEO_TYPE, YT_VIDEO_TYPE } from '../../../shared/constans/videos-types';
 import { YtDataService } from '../../../core/services/data-integration/yt-data.service';
 import { VimeoDataService } from '../../../core/services/data-integration/vimeo-data.service';
 import { SavedVideoData } from '../../../shared/interfaces/saved-video-data.interface';

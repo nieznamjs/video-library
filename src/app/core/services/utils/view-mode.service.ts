@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-import { VIEW_LIST, VIEW_TILES } from '../../config/view-mode.config';
+import { VIEW_LIST, VIEW_TILES } from '../../../shared/constans/view-mode';
 
 @Injectable({
   providedIn: 'root'

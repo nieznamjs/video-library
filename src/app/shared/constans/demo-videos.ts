@@ -1,5 +1,5 @@
-import { SavedVideoData } from '../../shared/interfaces/saved-video-data.interface';
-import { VIMEO_VIDEO_TYPE, YT_VIDEO_TYPE } from './videos-type.config';
+import { SavedVideoData } from '../interfaces/saved-video-data.interface';
+import { VIMEO_VIDEO_TYPE, YT_VIDEO_TYPE } from './videos-types';
 
 export const DEFAULT_VIDEOS_DATA: SavedVideoData[] = [
   {

@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 import { SavedVideoData } from '../../../shared/interfaces/saved-video-data.interface';
-import { LOCAL_STORAGE_VIDEOS_KEY } from '../../config/videos-storage.config';
+import { LOCAL_STORAGE_VIDEOS_KEY } from '../../../shared/constans/local-storage-keys';
 import { StorageService } from '../utils/storage.service';
 import { SnackbarService } from '../utils/snackbar.service';
-import { DEFAULT_VIDEOS_DATA } from '../../config/default-request.config';
+import { DEFAULT_VIDEOS_DATA } from '../../../shared/constans/demo-videos';
 
 @Injectable({
   providedIn: 'root'
