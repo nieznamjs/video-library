@@ -1,18 +1,15 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpErrorResponse } from '@angular/common/http';
-import { catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { Component, Inject } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 
 import { HelperService } from '../../../core/services/utils/helper.service';
 import { VIMEO_VIDEO_TYPE, YT_VIDEO_TYPE } from '../../../core/config/videos-type.config';
 import { YtDataService } from '../../../core/services/data-integration/yt-data.service';
 import { VimeoDataService } from '../../../core/services/data-integration/vimeo-data.service';
-import { YtVideosResponse } from '../../../shared/interfaces/youtube/yt-videos-response.interface';
-import { VimeoResponse } from '../../../shared/interfaces/vimeo/vimeo-response.interface';
 import { SavedVideoData } from '../../../shared/interfaces/saved-video-data.interface';
 import { VideosStoreService } from '../../../core/services/data-integration/videos-store.service';
 import { SnackbarService } from '../../../core/services/utils/snackbar.service';
+import { VideoNotSaved } from '../../../shared/interfaces/video-not-saved.interface';
 
 @Component({
   selector: 'app-search-form',
@@ -23,9 +20,9 @@ import { SnackbarService } from '../../../core/services/utils/snackbar.service';
     { provide: VIMEO_VIDEO_TYPE, useValue: VIMEO_VIDEO_TYPE },
   ],
 })
-export class SearchFormComponent implements OnInit {
+export class SearchFormComponent {
 
-  public form: FormGroup;
+  public searchField;
   private readonly VIDEO_NOT_FOUND_MESSAGE = 'Video not found';
 
   constructor(
@@ -39,80 +36,44 @@ export class SearchFormComponent implements OnInit {
     @Inject(VIMEO_VIDEO_TYPE) public vimeoVideoType: string,
   ) {}
 
-  public ngOnInit(): void {
-    this.form = this.createForm();
-  }
-
-  private clearInput(): void {
-    this.form.controls.searchField.reset();
-  }
-
   public getDemoVideos(): void {
     this.videosStoreService.getDemoVideos();
   }
 
   public onSubmit(): void {
-    const id = this.helperService.extractId(this.form.value.searchField);
-    const type = this.form.value.type;
+    const id = this.helperService.extractId(this.searchField);
     let foundVideo: SavedVideoData;
+    const ytObservable = this.ytDataService.getVideoByIds([id]);
+    const vimeoObservable = this.vimeoDataService.getVideoByIds([id]);
 
     if (id.trim() === '') {
       return;
     }
 
-    if (type === YT_VIDEO_TYPE) {
-      this.ytDataService.getVideoByIds([id])
-        .subscribe((response: YtVideosResponse) => {
-          const video = response.items[0];
+    forkJoin(ytObservable, vimeoObservable)
+      .subscribe((videosArrays: VideoNotSaved[][]) => {
+        const videos = videosArrays.filter((videos: VideoNotSaved[]) => videos.length !== 0)[0];
 
-          if (!video) {
-            this.snackbarService.openErrorSnackbar(this.VIDEO_NOT_FOUND_MESSAGE);
-          } else {
-            foundVideo = {
-              type: YT_VIDEO_TYPE,
-              id: video.id,
-              addedToLibraryAt: new Date(),
-              isFavourite: false,
-            };
+        if (!videos) {
+          this.snackbarService.openErrorSnackbar(this.VIDEO_NOT_FOUND_MESSAGE);
+        } else if (videos.length > 1) {
+          console.log('Znaleziono dwa filmy, wybierz który chcesz'); // TODO do it later
+        } else {
+          foundVideo = {
+            id: videos[0].id,
+            type: videos[0].type,
+            addedToLibraryAt: new Date(),
+            isFavourite: false,
+          };
 
-            this.videosStoreService.saveNewVideo(foundVideo);
-          }
-        });
-    } else {
-      this.vimeoDataService.getVideoByIds([id])
-        .pipe(
-          catchError((err: HttpErrorResponse) => {
-            if (err.statusText === 'Bad Request') {
-              this.snackbarService.openErrorSnackbar(this.VIDEO_NOT_FOUND_MESSAGE);
-            }
-            return of({});
-          })
-        )
-        .subscribe((response: VimeoResponse) => {
-          if (!response.data[0]) {
-            this.snackbarService.openErrorSnackbar(this.VIDEO_NOT_FOUND_MESSAGE);
-          } else {
-            const video = response.data[0];
-
-            foundVideo = {
-              type: VIMEO_VIDEO_TYPE,
-              id: this.helperService.extractId(video.link),
-              addedToLibraryAt: new Date(),
-              isFavourite: false,
-            };
-
-            this.videosStoreService.saveNewVideo(foundVideo);
-          }
-        });
-    }
+          this.videosStoreService.saveNewVideo(foundVideo);
+        }
+      });
 
     this.clearInput();
   }
 
-  private createForm(): FormGroup {
-    return this.fb.group({
-      searchField: ['', Validators.required],
-      type: [YT_VIDEO_TYPE],
-    });
+  private clearInput(): void {
+    this.searchField = '';
   }
 }

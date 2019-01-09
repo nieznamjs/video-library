@@ -7,10 +7,7 @@ import { YtDataService } from './yt-data.service';
 import { VimeoDataService } from './vimeo-data.service';
 import { SavedVideoData } from '../../../shared/interfaces/saved-video-data.interface';
 import { VideosStoreService } from './videos-store.service';
-import { VIMEO_VIDEO_TYPE, YT_VIDEO_TYPE } from '../../config/videos-type.config';
-import { YtVideo } from '../../../shared/interfaces/youtube/yt-video.interface';
-import { VimeoVideo } from '../../../shared/interfaces/vimeo/vimeo-video.interface';
-import { HelperService } from '../utils/helper.service';
+import { YT_VIDEO_TYPE } from '../../config/videos-type.config';
 import { SORT_DESCENDING } from '../../../shared/constans/sort-values';
 
 @Injectable({
@@ -27,7 +24,6 @@ export class VideosService {
     private ytDataService: YtDataService,
     private vimeoDataService: VimeoDataService,
     private videosStoreService: VideosStoreService,
-    private helperService: HelperService,
   ) {}
 
   public getVideosData(): void {
@@ -58,60 +54,19 @@ export class VideosService {
       );
 
     forkJoin([ytObservable, vimeoObservable])
-      .subscribe((responses: any) => {
+      .subscribe((videos: any) => {
         let videosToShow: ShownVideo[] = [];
-        const [ytResponse, vimeoResponse] = responses;
+        const [ytVideos, vimeoVideos] = videos;
 
-        const ytVideos = ytResponse.items.map((ytVideo: YtVideo) => {
-          const videoDataFromStorage = savedVideos.find(savedVideo => savedVideo.id === ytVideo.id);
+        videosToShow = videosToShow.concat(ytVideos, vimeoVideos);
+        videosToShow = videosToShow.map((video: ShownVideo) => {
+          const videoDataFromLocalStorage = savedVideos.find(videoData => videoData.id === video.id);
 
-          return {
-            id: ytVideo.id,
-            title: ytVideo.snippet.title,
-            likes: ytVideo.statistics.likeCount,
-            views: ytVideo.statistics.viewCount,
-            thumbnailUrl: ytVideo.snippet.thumbnails.default.url,
-            addedToLibraryAt: videoDataFromStorage.addedToLibraryAt,
-            isFavourite: videoDataFromStorage.isFavourite,
-            type: YT_VIDEO_TYPE,
-          };
+          video.addedToLibraryAt = videoDataFromLocalStorage.addedToLibraryAt;
+          video.isFavourite = videoDataFromLocalStorage.isFavourite;
+
+          return video;
         });
-
-        // ytResponse.items.forEach((ytVideo: YtVideo) => {
-        //   const videoDataFromStorage = savedVideos.find(savedVideo => savedVideo.id === ytVideo.id);
-        //
-        //   videosToShow.push({
-        //     id: ytVideo.id,
-        //     title: ytVideo.snippet.title,
-        //     likes: ytVideo.statistics.likeCount,
-        //     views: ytVideo.statistics.viewCount,
-        //     thumbnailUrl: ytVideo.snippet.thumbnails.default.url,
-        //     addedToLibraryAt: videoDataFromStorage.addedToLibraryAt,
-        //     isFavourite: videoDataFromStorage.isFavourite,
-        //     type: YT_VIDEO_TYPE,
-        //   });
-        // });
-
-        if (vimeoResponse.data) {
-          const vimeoVideos = vimeoResponse.data.map((vimeoVideo: VimeoVideo) => {
-            const id = this.helperService.extractId(vimeoVideo.link);
-            const videoDataFromStorage = savedVideos.find(savedVideo => savedVideo.id === id);
-
-            return {
-              id: id,
-              title: vimeoVideo.name,
-              likes: vimeoVideo.metadata.connections.likes.total.toString(),
-              thumbnailUrl: vimeoVideo.pictures.sizes[2].link,
-              addedToLibraryAt: videoDataFromStorage.addedToLibraryAt,
-              isFavourite: videoDataFromStorage.isFavourite,
-              type: VIMEO_VIDEO_TYPE,
-            };
-          });
-
-          videosToShow = videosToShow.concat(vimeoVideos);
-        }
-
-        videosToShow = videosToShow.concat(ytVideos);
 
         if (this.sortType === SORT_DESCENDING) {
           videosToShow = this.sortVideosDescending(videosToShow);

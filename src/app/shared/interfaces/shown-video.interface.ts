@@ -1,10 +1,6 @@
-export interface ShownVideo {
-  id: string;
-  type: string;
-  title: string;
-  likes: string;
-  views?: string;
-  thumbnailUrl: string;
+import { VideoNotSaved } from './video-not-saved.interface';
+
+export interface ShownVideo extends VideoNotSaved {
   addedToLibraryAt: Date;
   isFavourite: boolean;
 }
