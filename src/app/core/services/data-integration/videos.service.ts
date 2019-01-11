@@ -17,10 +17,7 @@ export class VideosService {
 
   public sortType = SORT_DESCENDING;
   public showOnlyFavourites = false;
-  private videos = [
-    { id: '123', isFavourite: false, likes: '123', views: '123', addedToLibraryAt: new Date('2005'), title: 'taa', thumbnailUrl: 'sada'},
-    { id: '123', isFavourite: true, likes: '123', views: '123', addedToLibraryAt: new Date('2004'), title: 'taa', thumbnailUrl: 'sada'},
-    ] as ShownVideo[];
+  private videos = [] as ShownVideo[];
   public videos$ = new BehaviorSubject<ShownVideo[]>([]);
   public isLoading$ = new BehaviorSubject<boolean>(false);
 
@@ -31,12 +28,11 @@ export class VideosService {
   ) {}
 
   public getVideosToShow(): void {
+    const savedVideosData: SavedVideoData[] = this.videosStoreService.getSavedVideos();
     let videos = [...this.videos];
 
-    // TODO napraiwć pokazywanie czy ulubione
-
     videos = videos.map((video: ShownVideo) => {
-      const videoDataFromLocalStorage = videos.find(videoData => videoData.id === video.id);
+      const videoDataFromLocalStorage = savedVideosData.find(videoData => videoData.id === video.id);
 
       video.addedToLibraryAt = videoDataFromLocalStorage.addedToLibraryAt;
       video.isFavourite = videoDataFromLocalStorage.isFavourite;
@@ -54,19 +50,18 @@ export class VideosService {
       videos = videos.filter(video => video.isFavourite);
     }
 
-    console.log(videos)
     this.videos$.next(videos);
   }
 
   public getVideosData(): void {
-    const savedVideos: SavedVideoData[] = this.videosStoreService.getSavedVideos();
+    const savedVideosData: SavedVideoData[] = this.videosStoreService.getSavedVideos();
     let videosToShow: ShownVideo[] = [];
     const ytIds = [];
     const vimeoIds = [];
 
     this.isLoading$.next(true);
 
-    savedVideos.forEach((video: SavedVideoData) => {
+    savedVideosData.forEach((video: SavedVideoData) => {
       if (video.type === YT_VIDEO_TYPE) {
         ytIds.push(video.id);
       } else {
@@ -88,7 +83,7 @@ export class VideosService {
 
         videosToShow = videosToShow.concat(ytVideos, vimeoVideos);
         videosToShow = videosToShow.map((video: ShownVideo) => {
-          const videoDataFromLocalStorage = savedVideos.find(videoData => videoData.id === video.id);
+          const videoDataFromLocalStorage = savedVideosData.find(videoData => videoData.id === video.id);
 
           video.addedToLibraryAt = videoDataFromLocalStorage.addedToLibraryAt;
           video.isFavourite = videoDataFromLocalStorage.isFavourite;
