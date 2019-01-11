@@ -8,7 +8,7 @@ import { VimeoDataService } from './vimeo-data.service';
 import { SavedVideoData } from '../../../shared/interfaces/saved-video-data.interface';
 import { VideosStoreService } from './videos-store.service';
 import { YT_VIDEO_TYPE } from '../../../shared/constans/videos-types';
-import { SORT_DESCENDING } from '../../../shared/constans/sort-values';
+import { SORT_ASCENDING, SORT_DESCENDING } from '../../../shared/constans/sort-values';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +17,10 @@ export class VideosService {
 
   public sortType = SORT_DESCENDING;
   public showOnlyFavourites = false;
+  private videos = [
+    { id: '123', isFavourite: false, likes: '123', views: '123', addedToLibraryAt: new Date('2005'), title: 'taa', thumbnailUrl: 'sada'},
+    { id: '123', isFavourite: true, likes: '123', views: '123', addedToLibraryAt: new Date('2004'), title: 'taa', thumbnailUrl: 'sada'},
+    ] as ShownVideo[];
   public videos$ = new BehaviorSubject<ShownVideo[]>([]);
   public isLoading$ = new BehaviorSubject<boolean>(false);
 
@@ -26,16 +30,41 @@ export class VideosService {
     private videosStoreService: VideosStoreService,
   ) {}
 
+  public getVideosToShow(): void {
+    let videos = [...this.videos];
+
+    // TODO napraiwć pokazywanie czy ulubione
+
+    videos = videos.map((video: ShownVideo) => {
+      const videoDataFromLocalStorage = videos.find(videoData => videoData.id === video.id);
+
+      video.addedToLibraryAt = videoDataFromLocalStorage.addedToLibraryAt;
+      video.isFavourite = videoDataFromLocalStorage.isFavourite;
+
+      return video;
+    });
+
+    if (this.sortType === SORT_DESCENDING) {
+      videos = this.sortVideosDescending(videos);
+    } else if (this.sortType === SORT_ASCENDING) {
+      videos = this.sortVideosAscending(videos);
+    }
+
+    if (this.showOnlyFavourites) {
+      videos = videos.filter(video => video.isFavourite);
+    }
+
+    console.log(videos)
+    this.videos$.next(videos);
+  }
+
   public getVideosData(): void {
-    let savedVideos: SavedVideoData[] = this.videosStoreService.getSavedVideos();
+    const savedVideos: SavedVideoData[] = this.videosStoreService.getSavedVideos();
+    let videosToShow: ShownVideo[] = [];
     const ytIds = [];
     const vimeoIds = [];
 
     this.isLoading$.next(true);
-
-    if (this.showOnlyFavourites) {
-      savedVideos = savedVideos.filter(video => video.isFavourite);
-    }
 
     savedVideos.forEach((video: SavedVideoData) => {
       if (video.type === YT_VIDEO_TYPE) {
@@ -55,7 +84,6 @@ export class VideosService {
 
     forkJoin([ytObservable, vimeoObservable])
       .subscribe((videos: any) => {
-        let videosToShow: ShownVideo[] = [];
         const [ytVideos, vimeoVideos] = videos;
 
         videosToShow = videosToShow.concat(ytVideos, vimeoVideos);
@@ -68,14 +96,9 @@ export class VideosService {
           return video;
         });
 
-        if (this.sortType === SORT_DESCENDING) {
-          videosToShow = this.sortVideosDescending(videosToShow);
-        } else {
-          videosToShow = this.sortVideosAscending(videosToShow);
-        }
-
-        this.videos$.next(videosToShow);
+        this.videos = videosToShow;
         this.isLoading$.next(false);
+        this.getVideosToShow();
       });
   }
 

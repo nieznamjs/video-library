@@ -13,7 +13,6 @@ import { ViewModeService } from '../../../core/services/utils/view-mode.service'
 })
 export class VideosListComponent implements OnInit {
 
-  private savedVideosData$ = this.videosStoreService.savedVideos$;
   public videosData: ShownVideo[];
   public isLoading$ = this.videosService.isLoading$;
   public viewMode$ = this.viewModeService.viewMode$;
@@ -33,11 +32,17 @@ export class VideosListComponent implements OnInit {
   ) { }
 
   public ngOnInit(): void {
-    this.savedVideosData$.subscribe(() => {
-      this.videosService.getVideosData();
-    });
+    this.videosStoreService.savedVideos$
+      .subscribe(() => {
+        this.videosService.getVideosToShow();
+      });
 
-    this.getAllVideosData();
+    this.videosService.videos$
+      .subscribe((videos: ShownVideo[]) => {
+        this.videosData = videos;
+      });
+
+    this.videosService.getVideosData();
   }
 
   public sliceVideosList(event): void {
@@ -52,14 +57,6 @@ export class VideosListComponent implements OnInit {
       this.lowValue = 0;
     }
     this.pageIndex = event.pageIndex;
-  }
-
-  private getAllVideosData(): void {
-    this.videosService.videos$
-      .subscribe((videos: ShownVideo[]) => {
-        this.videosData = videos;
-        this.paginatorLength = videos.length;
-      });
   }
 
   public clearAllVideos(): void {
