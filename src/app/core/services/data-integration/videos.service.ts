@@ -29,15 +29,30 @@ export class VideosService {
 
   public getVideosToShow(): void {
     const savedVideosData: SavedVideoData[] = this.videosStoreService.getSavedVideos();
+
+    if (savedVideosData.length < this.videos.length) {
+      const savedIds = savedVideosData.map(video => video.id);
+
+      this.videos = this.videos.filter((video: ShownVideo) => {
+        if (savedIds.includes(video.id)) {
+          return true;
+        }
+      });
+    } else if (savedVideosData.length > this.videos.length) {
+      this.getVideosData();
+    }
+
     let videos = [...this.videos];
 
     videos = videos.map((video: ShownVideo) => {
       const videoDataFromLocalStorage = savedVideosData.find(videoData => videoData.id === video.id);
 
-      video.addedToLibraryAt = videoDataFromLocalStorage.addedToLibraryAt;
-      video.isFavourite = videoDataFromLocalStorage.isFavourite;
+      if (videoDataFromLocalStorage) {
+        video.addedToLibraryAt = videoDataFromLocalStorage.addedToLibraryAt;
+        video.isFavourite = videoDataFromLocalStorage.isFavourite;
 
-      return video;
+        return video;
+      }
     });
 
     if (this.sortType === SORT_DESCENDING) {

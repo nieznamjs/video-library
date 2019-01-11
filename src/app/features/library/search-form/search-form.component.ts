@@ -10,6 +10,7 @@ import { SavedVideoData } from '../../../shared/interfaces/saved-video-data.inte
 import { VideosStoreService } from '../../../core/services/data-integration/videos-store.service';
 import { SnackbarService } from '../../../core/services/utils/snackbar.service';
 import { VideoNotSaved } from '../../../shared/interfaces/video-not-saved.interface';
+import { VideosService } from '../../../core/services/data-integration/videos.service';
 
 @Component({
   selector: 'app-search-form',
@@ -31,6 +32,7 @@ export class SearchFormComponent {
     private ytDataService: YtDataService,
     private vimeoDataService: VimeoDataService,
     private videosStoreService: VideosStoreService,
+    private videosService: VideosService,
     private snackbarService: SnackbarService,
     @Inject(YT_VIDEO_TYPE) public ytVideoType: string,
     @Inject(VIMEO_VIDEO_TYPE) public vimeoVideoType: string,
@@ -52,16 +54,16 @@ export class SearchFormComponent {
 
     forkJoin(ytObservable, vimeoObservable)
       .subscribe((videosArrays: VideoNotSaved[][]) => {
-        const videos = videosArrays.filter((videos: VideoNotSaved[]) => videos.length !== 0)[0];
+        const videosArray = videosArrays.filter(videos => videos.length !== 0)[0];
 
-        if (!videos) {
+        if (!videosArray) {
           this.snackbarService.openErrorSnackbar(this.VIDEO_NOT_FOUND_MESSAGE);
-        } else if (videos.length > 1) {
+        } else if (videosArray.length > 1) {
           console.log('Znaleziono dwa filmy, wybierz który chcesz'); // TODO do it later
         } else {
           foundVideo = {
-            id: videos[0].id,
-            type: videos[0].type,
+            id: videosArray[0].id,
+            type: videosArray[0].type,
             addedToLibraryAt: new Date(),
             isFavourite: false,
           };

@@ -6,6 +6,7 @@ import { LOCAL_STORAGE_VIDEOS_KEY } from '../../../shared/constans/local-storage
 import { StorageService } from '../utils/storage.service';
 import { SnackbarService } from '../utils/snackbar.service';
 import { DEFAULT_VIDEOS_DATA } from '../../../shared/constans/demo-videos';
+import { VIDEO_ADDED_MESSAGE, VIDEO_IS_ALREADY_SAVED_MESSAGE } from '../../../shared/constans/snackbar-messages';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +14,6 @@ import { DEFAULT_VIDEOS_DATA } from '../../../shared/constans/demo-videos';
 export class VideosStoreService {
 
   public savedVideos$ = new BehaviorSubject<SavedVideoData[]>(this.getSavedVideos());
-  private readonly VIDEO_ADDED_MESSAGE = 'Video has been saved';
-  private readonly VIDEO_IS_ALREADY_SAVED_MESSAGE = 'Video is already in library';
 
   constructor(
     private storageService: StorageService,
@@ -27,7 +26,10 @@ export class VideosStoreService {
   }
 
   public getDemoVideos(): void {
-    this.saveToLocalStorage(DEFAULT_VIDEOS_DATA);
+    let savedVideos = this.getSavedVideos();
+    savedVideos = savedVideos.concat(DEFAULT_VIDEOS_DATA);
+
+    this.saveToLocalStorage(savedVideos);
   }
 
   public getSavedVideos(): SavedVideoData[] {
@@ -38,12 +40,12 @@ export class VideosStoreService {
     const savedVideos = this.getSavedVideos();
 
     if (savedVideos.find(savedVideo => savedVideo.id === newVideo.id)) {
-      this.snackbarService.openErrorSnackbar(this.VIDEO_IS_ALREADY_SAVED_MESSAGE);
+      this.snackbarService.openErrorSnackbar(VIDEO_IS_ALREADY_SAVED_MESSAGE);
     } else {
       savedVideos.push(newVideo);
 
       this.saveToLocalStorage(savedVideos);
-      this.snackbarService.openSuccessSnackbar(this.VIDEO_ADDED_MESSAGE);
+      this.snackbarService.openSuccessSnackbar(VIDEO_ADDED_MESSAGE);
     }
   }
 

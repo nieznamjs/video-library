@@ -40,6 +40,7 @@ export class VideosListComponent implements OnInit {
     this.videosService.videos$
       .subscribe((videos: ShownVideo[]) => {
         this.videosData = videos;
+        this.paginatorLength = videos.length;
       });
 
     this.videosService.getVideosData();
