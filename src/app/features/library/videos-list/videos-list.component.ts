@@ -18,10 +18,10 @@ export class VideosListComponent implements OnInit {
   public viewMode$ = this.viewModeService.viewMode$;
   public paginatorLength: number;
   public pageIndex = 0;
-  public pageSize = 5;
+  public pageSize = 6;
   public lowValue = 0;
-  public highValue = 5;
-  public readonly PAGE_SIZE_OPTIONS = [5, 10, 20, 50, 100];
+  public highValue = 6;
+  public readonly PAGE_SIZE_OPTIONS = [6, 12, 24, 48, 96];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 

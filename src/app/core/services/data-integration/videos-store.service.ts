@@ -1,12 +1,19 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import _ from 'lodash';
 
 import { SavedVideoData } from '../../../shared/interfaces/saved-video-data.interface';
 import { LOCAL_STORAGE_VIDEOS_KEY } from '../../../shared/constans/local-storage-keys';
 import { StorageService } from '../utils/storage.service';
 import { SnackbarService } from '../utils/snackbar.service';
 import { DEFAULT_VIDEOS_DATA } from '../../../shared/constans/demo-videos';
-import { VIDEO_ADDED_MESSAGE, VIDEO_IS_ALREADY_SAVED_MESSAGE } from '../../../shared/constans/snackbar-messages';
+import {
+  ALL_VIDEOS_REMOVED_MESSAGE,
+  DEMO_VIDEOS_ADDED_MESSAGE,
+  DEMO_VIDEOS_ALREADY_IN_LIBRARY,
+  VIDEO_ADDED_MESSAGE, VIDEO_ADDED_TO_FAVOURITES_MESSAGE,
+  VIDEO_IS_ALREADY_SAVED_MESSAGE, VIDEO_REMOVED_FROM_FAVOURITES_MESSAGE, VIDEO_REMOVED_MESSAGE
+} from '../../../shared/constans/snackbar-messages';
 
 @Injectable({
   providedIn: 'root'
@@ -26,10 +33,16 @@ export class VideosStoreService {
   }
 
   public getDemoVideos(): void {
-    let savedVideos = this.getSavedVideos();
-    savedVideos = savedVideos.concat(DEFAULT_VIDEOS_DATA);
+    const savedVideos = this.getSavedVideos();
+    const concatenatedVideos = savedVideos.concat(DEFAULT_VIDEOS_DATA);
+    const filteredVideos = _.uniqBy(concatenatedVideos, 'id');
 
-    this.saveToLocalStorage(savedVideos);
+    if (savedVideos.length === filteredVideos.length) {
+      this.snackbarService.openErrorSnackbar(DEMO_VIDEOS_ALREADY_IN_LIBRARY);
+    } else {
+      this.saveToLocalStorage(filteredVideos);
+      this.snackbarService.openSuccessSnackbar(DEMO_VIDEOS_ADDED_MESSAGE);
+    }
   }
 
   public getSavedVideos(): SavedVideoData[] {
@@ -58,6 +71,7 @@ export class VideosStoreService {
     });
 
     this.saveToLocalStorage(savedVideos);
+    this.snackbarService.openSuccessSnackbar(VIDEO_ADDED_TO_FAVOURITES_MESSAGE);
   }
 
   public removeVideoFromFavourites(id: string): void {
@@ -66,6 +80,7 @@ export class VideosStoreService {
 
     videoToRemoveFromFavourites.isFavourite = false;
     this.saveToLocalStorage(savedVideos);
+    this.snackbarService.openSuccessSnackbar(VIDEO_REMOVED_FROM_FAVOURITES_MESSAGE);
   }
 
   public removeFromLibrary(id: string): void {
@@ -73,10 +88,12 @@ export class VideosStoreService {
     const filteredVideos = savedVideos.filter(video => video.id !== id);
 
     this.saveToLocalStorage(filteredVideos);
+    this.snackbarService.openSuccessSnackbar(VIDEO_REMOVED_MESSAGE);
   }
 
   public clearLibrary(): void {
     this.storageService.clear(LOCAL_STORAGE_VIDEOS_KEY);
     this.savedVideos$.next(this.getSavedVideos());
+    this.snackbarService.openSuccessSnackbar(ALL_VIDEOS_REMOVED_MESSAGE);
   }
 }

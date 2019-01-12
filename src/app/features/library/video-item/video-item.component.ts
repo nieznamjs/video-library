@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 
 import { ShownVideo } from '../../../shared/interfaces/shown-video.interface';
 import { VideosStoreService } from '../../../core/services/data-integration/videos-store.service';
-import { VideoModalService } from '../../../core/services/utils/video-modal.service';
+import { ModalService } from '../../../core/services/utils/modal.service';
 import { ViewModeService } from '../../../core/services/utils/view-mode.service';
 
 @Component({
@@ -17,12 +17,12 @@ export class VideoItemComponent {
 
   constructor(
     private videosStoreService: VideosStoreService,
-    private videoModalService: VideoModalService,
+    private modalService: ModalService,
     private viewModeService: ViewModeService,
   ) { }
 
   public openModalWithVideo(id: string, type: string): void {
-    this.videoModalService.openDialogWithVideo(id, type);
+    this.modalService.openDialogWithVideo(id, type);
   }
 
   public addToFavourites(id: string): void {

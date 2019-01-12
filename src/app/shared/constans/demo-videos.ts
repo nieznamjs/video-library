@@ -29,7 +29,7 @@ export const DEFAULT_VIDEOS_DATA: SavedVideoData[] = [
     addedToLibraryAt: new Date(),
   }, {
     id: 'y6120QOlsfU',
-    isFavourite: false,
+    isFavourite: true,
     type: YT_VIDEO_TYPE,
     addedToLibraryAt: new Date(),
   }, {

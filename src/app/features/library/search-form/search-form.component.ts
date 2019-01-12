@@ -11,6 +11,7 @@ import { VideosStoreService } from '../../../core/services/data-integration/vide
 import { SnackbarService } from '../../../core/services/utils/snackbar.service';
 import { VideoNotSaved } from '../../../shared/interfaces/video-not-saved.interface';
 import { VideosService } from '../../../core/services/data-integration/videos.service';
+import { ModalService } from '../../../core/services/utils/modal.service';
 
 @Component({
   selector: 'app-search-form',
@@ -23,7 +24,7 @@ import { VideosService } from '../../../core/services/data-integration/videos.se
 })
 export class SearchFormComponent {
 
-  public searchField;
+  public searchField = '';
   private readonly VIDEO_NOT_FOUND_MESSAGE = 'Video not found';
 
   constructor(
@@ -34,6 +35,7 @@ export class SearchFormComponent {
     private videosStoreService: VideosStoreService,
     private videosService: VideosService,
     private snackbarService: SnackbarService,
+    private modalService: ModalService,
     @Inject(YT_VIDEO_TYPE) public ytVideoType: string,
     @Inject(VIMEO_VIDEO_TYPE) public vimeoVideoType: string,
   ) {}
@@ -59,7 +61,7 @@ export class SearchFormComponent {
         if (!videosArray) {
           this.snackbarService.openErrorSnackbar(this.VIDEO_NOT_FOUND_MESSAGE);
         } else if (videosArray.length > 1) {
-          console.log('Znaleziono dwa filmy, wybierz który chcesz'); // TODO do it later
+          this.modalService.openModalToChooseVideo(videosArray);
         } else {
           foundVideo = {
             id: videosArray[0].id,

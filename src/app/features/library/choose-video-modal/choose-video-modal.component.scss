@@ -1,0 +1,21 @@
+.videos-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+
+.video {
+  cursor: pointer;
+
+  &:not(:last-child) {
+    margin-right: 20px;
+  }
+}
+
+.video-img {
+  width: 200px;
+}
+
+.video-data-text {
+  display: block;
+}
