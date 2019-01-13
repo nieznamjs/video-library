@@ -15,9 +15,9 @@ import { SORT_ASCENDING, SORT_DESCENDING } from '../../../shared/constans/sort-v
 })
 export class VideosService {
 
+  private videos: ShownVideo[] = [];
   public sortType = SORT_DESCENDING;
   public showOnlyFavourites = false;
-  private videos = [] as ShownVideo[];
   public videos$ = new BehaviorSubject<ShownVideo[]>([]);
   public isLoading$ = new BehaviorSubject<boolean>(false);
 

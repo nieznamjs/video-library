@@ -26,9 +26,7 @@ export class VimeoDataService {
   });
 
   public getVideoByIds(idsArray: string[]): Observable<VideoNotSaved[]> {
-    const ids = idsArray.map((id: string) => {
-      return `/videos/${id}`;
-    }).join(',');
+    const ids = idsArray.map((id: string) => `/videos/${id}`).join(',');
 
     return this.http.get<VimeoResponse>(`${environment.VIMEO_API_URL}?uris=${ids}`, { headers: this.VIMEO_HTTP_HEADERS })
       .pipe(
