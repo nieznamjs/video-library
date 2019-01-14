@@ -33,11 +33,7 @@ export class VideosService {
     if (savedVideosData.length < this.videos.length) {
       const savedIds = savedVideosData.map(video => video.id);
 
-      this.videos = this.videos.filter((video: ShownVideo) => {
-        if (savedIds.includes(video.id)) {
-          return true;
-        }
-      });
+      this.videos = this.videos.filter((video: ShownVideo) => savedIds.includes(video.id));
     } else if (savedVideosData.length > this.videos.length) {
       this.getVideosData();
     }

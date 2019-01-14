@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { HelperService } from '../../../core/services/utils/helper.service';
 import { VIMEO_VIDEO_TYPE, YT_VIDEO_TYPE } from '../../../shared/constans/videos-types';
@@ -55,9 +56,12 @@ export class SearchFormComponent {
     }
 
     forkJoin(ytObservable, vimeoObservable)
-      .subscribe((videosArrays: VideoNotSaved[][]) => {
-        const videosArray = videosArrays.filter(videos => videos.length !== 0)[0];
-
+      .pipe(
+        map((videosArrays: VideoNotSaved[][]) => {
+          return videosArrays.filter(videos => videos.length !== 0)[0];
+        })
+      )
+      .subscribe((videosArray: VideoNotSaved[]) => {
         if (!videosArray) {
           this.snackbarService.openErrorSnackbar(this.VIDEO_NOT_FOUND_MESSAGE);
         } else if (videosArray.length > 1) {
