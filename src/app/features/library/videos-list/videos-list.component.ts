@@ -32,18 +32,13 @@ export class VideosListComponent implements OnInit {
   ) { }
 
   public ngOnInit(): void {
-    this.videosStoreService.savedVideos$
-      .subscribe(() => {
-        this.videosService.getVideosToShow();
-      });
+    this.videosService.getAllVideos();
 
     this.videosService.videos$
       .subscribe((videos: ShownVideo[]) => {
         this.videosData = videos;
         this.paginatorLength = videos.length;
       });
-
-    this.videosService.getVideosData();
   }
 
   public sliceVideosList(event): void {
@@ -61,6 +56,6 @@ export class VideosListComponent implements OnInit {
   }
 
   public clearAllVideos(): void {
-    this.videosStoreService.clearLibrary();
+    this.videosService.clearLibrary();
   }
 }

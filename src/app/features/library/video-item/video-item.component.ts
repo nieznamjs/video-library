@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
 
 import { ShownVideo } from '../../../shared/interfaces/shown-video.interface';
-import { VideosStoreService } from '../../../core/services/data-integration/videos-store.service';
 import { ModalService } from '../../../core/services/utils/modal.service';
 import { ViewModeService } from '../../../core/services/utils/view-mode.service';
+import { VideosService } from '../../../core/services/data-integration/videos.service';
 
 @Component({
   selector: 'app-video-item',
@@ -16,24 +16,24 @@ export class VideoItemComponent {
   public viewMode$ = this.viewModeService.viewMode$;
 
   constructor(
-    private videosStoreService: VideosStoreService,
+    private videosService: VideosService,
     private modalService: ModalService,
     private viewModeService: ViewModeService,
   ) { }
 
-  public openModalWithVideo(id: string, type: string): void {
-    this.modalService.openDialogWithVideo(id, type);
+  public openModalWithVideo(): void {
+    this.modalService.openDialogWithVideo(this.video);
   }
 
   public addToFavourites(id: string): void {
-    this.videosStoreService.addVideoToFavourites(id);
+    this.videosService.addVideoToFavourites(id);
   }
 
   public removeFromFavourites(id: string): void {
-    this.videosStoreService.removeVideoFromFavourites(id);
+    this.videosService.removeVideoFromFavourites(id);
   }
 
   public removeFromLibrary(id: string): void {
-    this.videosStoreService.removeFromLibrary(id);
+    this.videosService.removeVideoFromLibrary(id);
   }
 }

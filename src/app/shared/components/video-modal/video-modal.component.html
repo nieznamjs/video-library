@@ -1,5 +1,5 @@
 <iframe
-  *ngIf="data.type === ytVideoType"
+  *ngIf="data.video.type === ytVideoType"
   width="640"
   height="360"
   [src]="YT_URL"
@@ -9,7 +9,7 @@
 </iframe>
 
 <iframe
-  *ngIf="data.type === vimeoVideoType"
+  *ngIf="data.video.type === vimeoVideoType"
   [src]="VIMEO_URL"
   width="640"
   height="360"

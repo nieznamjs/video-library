@@ -16,8 +16,8 @@ import { VIMEO_VIDEO_TYPE, YT_VIDEO_TYPE } from '../../constans/videos-types';
 })
 export class VideoModalComponent {
 
-  public readonly YT_URL = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${this.data.id}`);
-  public readonly VIMEO_URL = this.sanitizer.bypassSecurityTrustResourceUrl(`https://player.vimeo.com/video/${this.data.id}`);
+  public readonly YT_URL = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${this.data.video.id}`);
+  public readonly VIMEO_URL = this.sanitizer.bypassSecurityTrustResourceUrl(`https://player.vimeo.com/video/${this.data.video.id}`);
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ModalVideoData,

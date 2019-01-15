@@ -9,7 +9,6 @@ import { SnackbarService } from '../utils/snackbar.service';
 import { DEFAULT_VIDEOS_DATA } from '../../../shared/constans/demo-videos';
 import {
   ALL_VIDEOS_REMOVED_MESSAGE,
-  DEMO_VIDEOS_ADDED_MESSAGE,
   DEMO_VIDEOS_ALREADY_IN_LIBRARY,
   VIDEO_ADDED_MESSAGE,
   VIDEO_ADDED_TO_FAVOURITES_MESSAGE,
@@ -30,12 +29,12 @@ export class VideosStoreService {
     private snackbarService: SnackbarService,
   ) { }
 
-  private saveToLocalStorage(videos: SavedVideoData[]) {
+  private saveToLocalStorage(videos: SavedVideoData[]): void {
     this.storageService.set(LOCAL_STORAGE_VIDEOS_KEY, videos);
     this.savedVideos$.next(this.getSavedVideos());
   }
 
-  public getDemoVideos(): void {
+  public getDemoVideos(): SavedVideoData[] {
     const savedVideos = this.getSavedVideos();
     const concatenatedVideos = savedVideos.concat(DEFAULT_VIDEOS_DATA);
     const filteredVideos = _.uniqBy(concatenatedVideos, 'id');
@@ -43,8 +42,7 @@ export class VideosStoreService {
     if (savedVideos.length === filteredVideos.length) {
       this.snackbarService.openErrorSnackbar(DEMO_VIDEOS_ALREADY_IN_LIBRARY);
     } else {
-      this.saveToLocalStorage(filteredVideos);
-      this.snackbarService.openSuccessSnackbar(DEMO_VIDEOS_ADDED_MESSAGE);
+      return filteredVideos;
     }
   }
 

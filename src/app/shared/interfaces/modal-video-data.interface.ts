@@ -1,4 +1,5 @@
+import { ShownVideo } from './shown-video.interface';
+
 export interface ModalVideoData {
-  id: string;
-  type: string;
+  video: ShownVideo;
 }
