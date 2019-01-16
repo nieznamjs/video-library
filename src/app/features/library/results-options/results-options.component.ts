@@ -28,7 +28,7 @@ export class ResultsOptionsComponent {
 
   public changeSorting(): void {
     this.videosService.sortType = this.sortType;
-    this.videosService.sortVideos();
+    this.videosService.emitVideos();
   }
 
   public changeViewToList(): void {
@@ -41,6 +41,6 @@ export class ResultsOptionsComponent {
 
   public toggleFavourites(event: MatSlideToggleChange): void {
     this.videosService.showOnlyFavourites = event.checked;
-    this.videosService.checkIfOnlyFavourites();
+    this.videosService.emitVideos();
   }
 }

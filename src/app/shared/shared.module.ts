@@ -25,6 +25,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { SuccessSnackbarComponent } from './components/snackbars/success-snackbar/success-snackbar.component';
 import { ErrorSnackbarComponent } from './components/snackbars/error-snackbar/error-snackbar.component';
 import { VideoModalComponent } from './components/video-modal/video-modal.component';
+import { VIMEO_VIDEO_TYPE, YT_VIDEO_TYPE } from './constans/videos-types';
 
 const materialModules = [
   MatPaginatorModule,
@@ -81,6 +82,8 @@ const materialModules = [
         duration: 3000,
       },
     },
-  ],
+      { provide: YT_VIDEO_TYPE, useValue: YT_VIDEO_TYPE },
+      { provide: VIMEO_VIDEO_TYPE, useValue: VIMEO_VIDEO_TYPE },
+    ],
 })
 export class SharedModule { }

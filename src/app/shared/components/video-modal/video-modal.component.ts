@@ -9,10 +9,6 @@ import { VIMEO_VIDEO_TYPE, YT_VIDEO_TYPE } from '../../constans/videos-types';
   selector: 'app-video-modal',
   templateUrl: './video-modal.component.html',
   styleUrls: ['./video-modal.component.scss'],
-  providers: [
-    { provide: YT_VIDEO_TYPE, useValue: YT_VIDEO_TYPE },
-    { provide: VIMEO_VIDEO_TYPE, useValue: VIMEO_VIDEO_TYPE },
-  ],
 })
 export class VideoModalComponent {
 

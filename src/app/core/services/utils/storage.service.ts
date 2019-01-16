@@ -1,23 +1,40 @@
 import { Injectable } from '@angular/core';
 
+import { SnackbarService } from './snackbar.service';
+import { LOCAL_STORAGE_ERROR } from '../../../shared/constans/snackbar-messages';
+
 @Injectable({
   providedIn: 'root'
 })
 export class StorageService {
 
-  public get(key: string): any {
-    const data = localStorage.getItem(key);
+  constructor(private snackbarService: SnackbarService) {}
 
-    return JSON.parse(data);
+  public get(key: string): any {
+    try {
+      const data = localStorage.getItem(key);
+
+      return JSON.parse(data);
+    } catch (err) {
+      this.snackbarService.openErrorSnackbar(`${LOCAL_STORAGE_ERROR}: Error code: ${err.code}`);
+    }
   }
 
   public set(key: string, data: any): void {
-    const serializedData = JSON.stringify(data);
+    try {
+      const serializedData = JSON.stringify(data);
 
-    localStorage.setItem(key, serializedData);
+      localStorage.setItem(key, serializedData);
+    } catch (err) {
+      this.snackbarService.openErrorSnackbar(`${LOCAL_STORAGE_ERROR}: Error code: ${err.code}`);
+    }
   }
 
   public clear(key: string): void {
-    localStorage.removeItem(key);
+    try {
+      localStorage.removeItem(key);
+    } catch (err) {
+      this.snackbarService.openErrorSnackbar(`${LOCAL_STORAGE_ERROR}: Error code: ${err.code}`);
+    }
   }
 }

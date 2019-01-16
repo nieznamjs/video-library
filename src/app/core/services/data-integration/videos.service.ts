@@ -12,7 +12,11 @@ import { YT_VIDEO_TYPE } from '../../../shared/constans/videos-types';
 import { SORT_DESCENDING } from '../../../shared/constans/sort-values';
 import { VideoNotSaved } from '../../../shared/interfaces/video-not-saved.interface';
 import { SnackbarService } from '../utils/snackbar.service';
-import { DEMO_VIDEOS_ADDED_MESSAGE, VIDEO_NOT_FOUND_MESSAGE } from '../../../shared/constans/snackbar-messages';
+import {
+  DEMO_VIDEOS_ADDED_MESSAGE,
+  VIDEO_IS_ALREADY_SAVED_MESSAGE,
+  VIDEO_NOT_FOUND_MESSAGE
+} from '../../../shared/constans/snackbar-messages';
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +39,6 @@ export class VideosService {
   private getVideos(savedVideosData: SavedVideoData[]): Observable<ShownVideo[]> {
     const ytIds = [];
     const vimeoIds = [];
-    let foundVideos: ShownVideo[] = [];
 
     this.isLoading$.next(true);
 
@@ -52,11 +55,10 @@ export class VideosService {
 
     return forkJoin([ytObservable, vimeoObservable])
       .pipe(
-        map((videos: any) => {
+        map((videos: VideoNotSaved[][]) => {
           const [ytVideos, vimeoVideos] = videos;
 
-          foundVideos = foundVideos.concat(ytVideos, vimeoVideos);
-          foundVideos = foundVideos.map((video: ShownVideo) => {
+          return [...ytVideos, ...vimeoVideos].map((video: ShownVideo) => {
             const videoDataFromLocalStorage = savedVideosData.find(videoData => videoData.id === video.id);
 
             video.addedToLibraryAt = videoDataFromLocalStorage.addedToLibraryAt;
@@ -64,8 +66,6 @@ export class VideosService {
 
             return video;
           });
-
-          return foundVideos;
         })
       );
   }
@@ -78,7 +78,7 @@ export class VideosService {
     forkJoin(ytObservable, vimeoObservable)
       .pipe(
         map((videosArrays: VideoNotSaved[][]) => {
-          return videosArrays.filter(videos => videos.length !== 0)[0];
+          return videosArrays.find(videos => videos.length !== 0);
         })
       )
       .subscribe((videosArray: VideoNotSaved[]) => {
@@ -96,7 +96,11 @@ export class VideosService {
             isFavourite: false,
           };
 
-          this.saveNewVideo(foundVideo);
+          if (this.videos.find((video: ShownVideo) => video.id === foundVideo.id)) {
+            this.snackbarService.openErrorSnackbar(VIDEO_IS_ALREADY_SAVED_MESSAGE);
+          } else {
+            this.saveNewVideo(foundVideo);
+          }
         }
       });
   }
@@ -108,7 +112,7 @@ export class VideosService {
       .subscribe((videos: ShownVideo[]) => {
         this.isLoading$.next(false);
         this.videos = videos;
-        this.sortVideos();
+        this.emitVideos();
       });
   }
 
@@ -120,7 +124,7 @@ export class VideosService {
       addedToLibraryAt: newVideo.addedToLibraryAt,
     });
     this.videos.push(newVideo);
-    this.sortVideos();
+    this.emitVideos();
   }
 
   public removeVideoFromLibrary(id: string): void {
@@ -128,7 +132,7 @@ export class VideosService {
 
     this.videosStoreService.removeFromLibrary(id);
     this.videos = filteredVideos;
-    this.videos$.next(this.videos);
+    this.emitVideos();
   }
 
   public addVideoToFavourites(id: string): void {
@@ -141,7 +145,7 @@ export class VideosService {
 
     this.videosStoreService.addVideoToFavourites(id);
     this.videos = videosCopy;
-    this.checkIfOnlyFavourites();
+    this.emitVideos();
   }
 
   public removeVideoFromFavourites(id: string): void {
@@ -152,7 +156,7 @@ export class VideosService {
 
     this.videosStoreService.removeVideoFromFavourites(id);
     this.videos = videosCopy;
-    this.checkIfOnlyFavourites();
+    this.emitVideos();
   }
 
   public getDemoVideos(): void {
@@ -171,7 +175,7 @@ export class VideosService {
         .subscribe((videos: ShownVideo[]) => {
           this.isLoading$.next(false);
           this.videos.push(...videos);
-          this.sortVideos();
+          this.emitVideos();
           this.snackbarService.openSuccessSnackbar(DEMO_VIDEOS_ADDED_MESSAGE);
         });
     }
@@ -187,10 +191,11 @@ export class VideosService {
     }
 
     this.videos = sortedVideos;
-    this.checkIfOnlyFavourites();
   }
 
-  public checkIfOnlyFavourites(): void {
+  public emitVideos(): void {
+    this.sortVideos();
+
     if (this.showOnlyFavourites) {
       const filteredVideos = this.videos.filter((video: ShownVideo) => video.isFavourite);
       this.videos$.next(filteredVideos);
@@ -202,6 +207,6 @@ export class VideosService {
   public clearLibrary(): void {
     this.videosStoreService.clearLibrary();
     this.videos = [];
-    this.videos$.next(this.videos);
+    this.emitVideos();
   }
 }
