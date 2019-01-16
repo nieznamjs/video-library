@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, forkJoin, Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { BehaviorSubject, forkJoin, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import _ from 'lodash';
 
 import { ShownVideo } from '../../../shared/interfaces/shown-video.interface';
 import { YtDataService } from './yt-data.service';
@@ -8,10 +9,9 @@ import { VimeoDataService } from './vimeo-data.service';
 import { SavedVideoData } from '../../../shared/interfaces/saved-video-data.interface';
 import { VideosStoreService } from './videos-store.service';
 import { YT_VIDEO_TYPE } from '../../../shared/constans/videos-types';
-import { SORT_ASCENDING, SORT_DESCENDING } from '../../../shared/constans/sort-values';
+import { SORT_DESCENDING } from '../../../shared/constans/sort-values';
 import { VideoNotSaved } from '../../../shared/interfaces/video-not-saved.interface';
 import { SnackbarService } from '../utils/snackbar.service';
-import { ModalService } from '../utils/modal.service';
 import { DEMO_VIDEOS_ADDED_MESSAGE, VIDEO_NOT_FOUND_MESSAGE } from '../../../shared/constans/snackbar-messages';
 
 @Injectable({
@@ -30,13 +30,12 @@ export class VideosService {
     private vimeoDataService: VimeoDataService,
     private videosStoreService: VideosStoreService,
     private snackbarService: SnackbarService,
-    private modalService: ModalService,
   ) {}
 
   private getVideos(savedVideosData: SavedVideoData[]): Observable<ShownVideo[]> {
     const ytIds = [];
     const vimeoIds = [];
-    let videosToShow: ShownVideo[] = [];
+    let foundVideos: ShownVideo[] = [];
 
     this.isLoading$.next(true);
 
@@ -49,22 +48,15 @@ export class VideosService {
     });
 
     const ytObservable = this.ytDataService.getVideoByIds(ytIds);
-    const vimeoObservable = this.vimeoDataService.getVideoByIds(vimeoIds)
-      .pipe(
-        catchError((err) => {
-          // TODO handle it
-          console.log(err);
-          return of({});
-        })
-      );
+    const vimeoObservable = this.vimeoDataService.getVideoByIds(vimeoIds);
 
     return forkJoin([ytObservable, vimeoObservable])
       .pipe(
         map((videos: any) => {
           const [ytVideos, vimeoVideos] = videos;
 
-          videosToShow = videosToShow.concat(ytVideos, vimeoVideos);
-          videosToShow = videosToShow.map((video: ShownVideo) => {
+          foundVideos = foundVideos.concat(ytVideos, vimeoVideos);
+          foundVideos = foundVideos.map((video: ShownVideo) => {
             const videoDataFromLocalStorage = savedVideosData.find(videoData => videoData.id === video.id);
 
             video.addedToLibraryAt = videoDataFromLocalStorage.addedToLibraryAt;
@@ -73,7 +65,7 @@ export class VideosService {
             return video;
           });
 
-          return videosToShow;
+          return foundVideos;
         })
       );
   }
@@ -92,8 +84,6 @@ export class VideosService {
       .subscribe((videosArray: VideoNotSaved[]) => {
         if (!videosArray) {
           this.snackbarService.openErrorSnackbar(VIDEO_NOT_FOUND_MESSAGE);
-        } else if (videosArray.length > 1) {
-          this.modalService.openModalToChooseVideo(videosArray);
         } else {
           foundVideo = {
             id: videosArray[0].id,
@@ -118,7 +108,7 @@ export class VideosService {
       .subscribe((videos: ShownVideo[]) => {
         this.isLoading$.next(false);
         this.videos = videos;
-        this.videos$.next(this.videos);
+        this.sortVideos();
       });
   }
 
@@ -130,7 +120,7 @@ export class VideosService {
       addedToLibraryAt: newVideo.addedToLibraryAt,
     });
     this.videos.push(newVideo);
-    this.videos$.next(this.videos);
+    this.sortVideos();
   }
 
   public removeVideoFromLibrary(id: string): void {
@@ -142,7 +132,7 @@ export class VideosService {
   }
 
   public addVideoToFavourites(id: string): void {
-    const mappedVideos = this.videos.map((video: ShownVideo) => {
+    const videosCopy = this.videos.map((video: ShownVideo) => {
       if (video.id === id) {
         video.isFavourite = true;
       }
@@ -150,19 +140,19 @@ export class VideosService {
     });
 
     this.videosStoreService.addVideoToFavourites(id);
-    this.videos = mappedVideos;
-    this.videos$.next(this.videos);
+    this.videos = videosCopy;
+    this.checkIfOnlyFavourites();
   }
 
   public removeVideoFromFavourites(id: string): void {
-    const videosArrayCopy = [...this.videos];
-    const videoToRemoveFromFavourites = videosArrayCopy.find(video => video.id === id);
+    const videosCopy = [...this.videos];
+    const videoToRemoveFromFavourites = videosCopy.find(video => video.id === id);
 
     videoToRemoveFromFavourites.isFavourite = false;
 
     this.videosStoreService.removeVideoFromFavourites(id);
-    this.videos = videosArrayCopy;
-    this.videos$.next(this.videos);
+    this.videos = videosCopy;
+    this.checkIfOnlyFavourites();
   }
 
   public getDemoVideos(): void {
@@ -181,119 +171,37 @@ export class VideosService {
         .subscribe((videos: ShownVideo[]) => {
           this.isLoading$.next(false);
           this.videos.push(...videos);
-          this.videos$.next(this.videos);
+          this.sortVideos();
           this.snackbarService.openSuccessSnackbar(DEMO_VIDEOS_ADDED_MESSAGE);
         });
+    }
+  }
+
+  public sortVideos(): void {
+    const videosCopy = [...this.videos];
+
+    const sortedVideos = _.sortBy(videosCopy, 'addedToLibraryAt');
+
+    if (this.sortType === SORT_DESCENDING) {
+      sortedVideos.reverse();
+    }
+
+    this.videos = sortedVideos;
+    this.checkIfOnlyFavourites();
+  }
+
+  public checkIfOnlyFavourites(): void {
+    if (this.showOnlyFavourites) {
+      const filteredVideos = this.videos.filter((video: ShownVideo) => video.isFavourite);
+      this.videos$.next(filteredVideos);
+    } else {
+      this.videos$.next(this.videos);
     }
   }
 
   public clearLibrary(): void {
     this.videosStoreService.clearLibrary();
     this.videos = [];
-    this.videos$.next(this.videos);
-  }
-
-  // public getVideosToShow(): void {
-  //   const savedVideosData: SavedVideoData[] = this.videosStoreService.getSavedVideos();
-  //
-  //   if (savedVideosData.length < this.videos.length) {
-  //     const savedIds = savedVideosData.map(video => video.id);
-  //
-  //     this.videos = this.videos.filter((video: ShownVideo) => savedIds.includes(video.id));
-  //   } else if (savedVideosData.length > this.videos.length) {
-  //     this.getVideosData();
-  //   }
-  //
-  //   let videos = [...this.videos];
-  //
-  //   videos = videos.map((video: ShownVideo) => {
-  //     const videoDataFromLocalStorage = savedVideosData.find(videoData => videoData.id === video.id);
-  //
-  //     if (videoDataFromLocalStorage) {
-  //       video.addedToLibraryAt = videoDataFromLocalStorage.addedToLibraryAt;
-  //       video.isFavourite = videoDataFromLocalStorage.isFavourite;
-  //
-  //       return video;
-  //     }
-  //   });
-  //
-  //   videos = this.sortVideos(videos);
-  //
-  //   if (this.showOnlyFavourites) {
-  //     videos = videos.filter(video => video.isFavourite);
-  //   }
-  //
-  //   this.videos$.next(videos);
-  // }
-  //
-  // public getVideosData(): void {
-  //   const savedVideosData: SavedVideoData[] = this.videosStoreService.getSavedVideos();
-  //   const ytIds = [];
-  //   const vimeoIds = [];
-  //   let videosToShow: ShownVideo[] = [];
-  //
-  //   this.isLoading$.next(true);
-  //
-  //   savedVideosData.forEach((video: SavedVideoData) => {
-  //     if (video.type === YT_VIDEO_TYPE) {
-  //       ytIds.push(video.id);
-  //     } else {
-  //       vimeoIds.push(video.id);
-  //     }
-  //   });
-  //
-  //   const ytObservable = this.ytDataService.getVideoByIds(ytIds);
-  //   const vimeoObservable = this.vimeoDataService.getVideoByIds(vimeoIds)
-  //     .pipe(
-  //       catchError(() => {
-  //         return of({});
-  //       })
-  //     );
-  //
-  //   forkJoin([ytObservable, vimeoObservable])
-  //     .subscribe((videos: any) => {
-  //       const [ytVideos, vimeoVideos] = videos;
-  //
-  //       videosToShow = videosToShow.concat(ytVideos, vimeoVideos);
-  //       videosToShow = videosToShow.map((video: ShownVideo) => {
-  //         const videoDataFromLocalStorage = savedVideosData.find(videoData => videoData.id === video.id);
-  //
-  //         video.addedToLibraryAt = videoDataFromLocalStorage.addedToLibraryAt;
-  //         video.isFavourite = videoDataFromLocalStorage.isFavourite;
-  //
-  //         return video;
-  //       });
-  //
-  //       this.videos = videosToShow;
-  //       this.isLoading$.next(false);
-  //       this.getVideosToShow();
-  //     });
-  // }
-
-  public sortVideos(): void {
-    const copyOfArray = [...this.videos];
-
-    if (this.sortType === SORT_ASCENDING) {
-      copyOfArray.sort((a, b) => {
-        if (a.addedToLibraryAt > b.addedToLibraryAt) {
-          return 1;
-        } else if (a.addedToLibraryAt < b.addedToLibraryAt) {
-          return -1;
-        }
-        return 0;
-      });
-    } else {
-      copyOfArray.sort((a, b) => {
-        if (a.addedToLibraryAt < b.addedToLibraryAt) {
-          return 1;
-        } else if (a.addedToLibraryAt > b.addedToLibraryAt) {
-          return -1;
-        }
-        return 0;
-      });
-    }
-
-    this.videos = copyOfArray;
     this.videos$.next(this.videos);
   }
 }

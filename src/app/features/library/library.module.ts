@@ -7,7 +7,6 @@ import { ResultsOptionsComponent } from './results-options/results-options.compo
 import { SharedModule } from '../../shared/shared.module';
 import { VideosListComponent } from './videos-list/videos-list.component';
 import { VideoItemComponent } from './video-item/video-item.component';
-import { ChooseVideoModalComponent } from './choose-video-modal/choose-video-modal.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +15,6 @@ import { ChooseVideoModalComponent } from './choose-video-modal/choose-video-mod
     ResultsOptionsComponent,
     VideosListComponent,
     VideoItemComponent,
-    ChooseVideoModalComponent,
   ],
   imports: [
     CommonModule,
@@ -24,9 +22,6 @@ import { ChooseVideoModalComponent } from './choose-video-modal/choose-video-mod
   ],
   exports: [
     LibraryComponent,
-  ],
-  entryComponents: [
-    ChooseVideoModalComponent,
   ],
 })
 export class LibraryModule { }

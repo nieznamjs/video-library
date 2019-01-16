@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 import _ from 'lodash';
 
 import { SavedVideoData } from '../../../shared/interfaces/saved-video-data.interface';
@@ -22,8 +21,6 @@ import {
 })
 export class VideosStoreService {
 
-  public savedVideos$ = new BehaviorSubject<SavedVideoData[]>(this.getSavedVideos());
-
   constructor(
     private storageService: StorageService,
     private snackbarService: SnackbarService,
@@ -31,7 +28,6 @@ export class VideosStoreService {
 
   private saveToLocalStorage(videos: SavedVideoData[]): void {
     this.storageService.set(LOCAL_STORAGE_VIDEOS_KEY, videos);
-    this.savedVideos$.next(this.getSavedVideos());
   }
 
   public getDemoVideos(): SavedVideoData[] {
@@ -94,7 +90,6 @@ export class VideosStoreService {
 
   public clearLibrary(): void {
     this.storageService.clear(LOCAL_STORAGE_VIDEOS_KEY);
-    this.savedVideos$.next(this.getSavedVideos());
     this.snackbarService.openSuccessSnackbar(ALL_VIDEOS_REMOVED_MESSAGE);
   }
 }

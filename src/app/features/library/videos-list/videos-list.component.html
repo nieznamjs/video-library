@@ -1,18 +1,19 @@
 <mat-spinner *ngIf="isLoading$ | async; else result" class="loading-spinner"></mat-spinner>
 <ng-template #result>
   <ul [classList]="viewMode$ | async">
-    <li *ngFor="let video of videosData | slice: lowValue: highValue">
+    <li *ngFor="let video of videosData | slice: (pageIndex * pageSize): ((pageIndex + 1) * pageSize)">
       <app-video-item [video]="video" [classList]="viewMode$ | async"></app-video-item>
     </li>
   </ul>
 </ng-template>
 
 <mat-paginator
+  #paginator
   [length]="paginatorLength"
   [pageIndex]="pageIndex"
   [pageSize]="pageSize"
   [pageSizeOptions]="PAGE_SIZE_OPTIONS"
-  (page)="sliceVideosList($event)">
+  (page)="getPaginatorData($event)">
 </mat-paginator>
 
 <button mat-raised-button color="warn" (click)="clearAllVideos()">

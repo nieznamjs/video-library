@@ -41,5 +41,6 @@ export class ResultsOptionsComponent {
 
   public toggleFavourites(event: MatSlideToggleChange): void {
     this.videosService.showOnlyFavourites = event.checked;
+    this.videosService.checkIfOnlyFavourites();
   }
 }
